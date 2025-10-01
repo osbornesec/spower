@@ -7,12 +7,11 @@
     <body>
       <main>
         <section>
-          <h2>PRO Version</h2>
+          <h2>Extension Status</h2>
           <div>
-            <label for="proActivationKey">Activation key</label><br>
-            <input id="proActivationKey" type="text" class="pro-activation-key">
-            <p>Paste/Enter your PRO activation key here.</p>
-            <a href="https://www.clemensteichmann.com/superpowers-for-twitter/pro" class="button button--pro hidden-pro" target="_blank">Get PRO</a>
+            <p>All automation features are unlocked. No activation key is required.</p>
+            <input id="proActivationKey" type="text" class="pro-activation-key" value="All features unlocked" readonly>
+            <p>This field is kept for backward compatibility and is not needed.</p>
           </div>
         </section>
         <section>
@@ -33,7 +32,6 @@
             <label for="followLimit">Limit</label><br>
             <input id="followLimit" step="1" type="number">
             <p>The extension will stop following when the limit (successfully followed profiles) is reached. Leave this field empty to set no limit.</p>
-            <p class="notification is-warning hidden-pro">With the free version you can only follow a maximum of 50 at a time.</p>
             <hr>
             <label for="followDailyLimit">Daily limit</label><br>
             <input id="followDailyLimit" step="1" type="number">
@@ -142,7 +140,6 @@
             <label for="unfollowLimit">Limit</label><br>
             <input type="number" id="unfollowLimit" step="1">
             <p>The extension will stop unfollowing when the limit (successfully unfollowed profiles) is reached. Leave this field empty to set no limit.</p>
-            <p class="notification is-warning hidden-pro">With the free version you can only unfollow a maximum of 50 at a time.</p>
             <hr>
             <label for="unfollowSkipFollower">Skip follower</label><br>
             <label>
@@ -192,7 +189,6 @@
             <label for="likeLimit">Limit</label><br>
             <input id="likeLimit" step="1" type="number">
             <p>The extension will stop liking when the limit (successfully liked Tweets) is reached. Leave this field empty to set no limit.</p>
-            <p class="notification is-warning hidden-pro">With the free version you can only like a maximum of 50 at a time.</p>
             <hr>
             <label for="likeMinTweetLikes">Minimum Tweet likes</label><br>
             <input id="likeMinTweetLikes" step="1" type="number">
@@ -271,7 +267,6 @@
             <label for="unlikeLimit">Limit</label><br>
             <input type="number" id="unlikeLimit" step="1">
             <p>The extension will stop unliking when the limit (successfully unliked Tweets) is reached. Leave this field empty to set no limit.</p>
-            <p class="notification is-warning hidden-pro">With the free version you can only unlike a maximum of 50 at a time.</p>
             <hr>
             <label for="unlikeMinDaysSinceLike">Minimum days since Like</label><br>
             <input type="number" id="unlikeMinDaysSinceLike" step="1" min="0">
@@ -295,7 +290,6 @@
             <label for="retweetLimit">Limit</label><br>
             <input id="retweetLimit" step="1" type="number">
             <p>The extension will stop retweeting when the limit (successfully retweeted Tweets) is reached. Leave this field empty to set no limit.</p>
-            <p class="notification is-warning hidden-pro">With the free version you can only retweet a maximum of 50 at a time.</p>
             <hr>
             <label for="retweetSkipFollowed">Skip followed</label><br>
             <label>
@@ -338,7 +332,6 @@
             <label for="unretweetLimit">Limit</label><br>
             <input type="number" id="unretweetLimit" step="1">
             <p>The extension will stop unretweeting when the limit (successfully unretweeted Tweets) is reached. Leave this field empty to set no limit.</p>
-            <p class="notification is-warning hidden-pro">With the free version you can only unretweet a maximum of 50 at a time.</p>
             <hr>
             <label for="unretweetMinDaysSinceRetweet">Minimum days since Retweet</label><br>
             <input type="number" id="unretweetMinDaysSinceRetweet" step="1" min="0">
@@ -355,7 +348,6 @@
           <div>
             <p>The autopilot performs a series of actions and repeats them after a certain pause. As soon as you have defined at least 2 actions, the autopilot can be started on the Twitter homepage (you may need to refresh the Twitter page). The Mass Follow, Mass Unfollow, Mass Like and Mass Retweet options defined above do apply.</p>
             <p class="notification is-info"><a href="https://www.youtube.com/watch?v=M8coqv82T9c" target="_blank">Watch the demo</a> to see how to set it up</p>
-            <p class="notification is-warning hidden-pro">In the free version, the autopilot is limited to 2 actions.</p>
             <table class="actions">
               <thead>
                 <tr class="action">
@@ -379,7 +371,6 @@
             &ndash;
             <input id="autopilotRepeatAfterMax" min="1" placeholder="Max" step="1" type="number">
             <p>Repeat autopilot after x minutes (random between Min &ndash; Max). Leave this field empty if you do not want to repeat the autopilot.</p>
-            <p class="notification is-warning hidden-pro">Not supported in the free version</p>
             <hr>
             <label for="autopilotPauseAfterActionMin">Pause after action (seconds)</label><br>
             <input min="0.1" id="autopilotPauseAfterActionMin" placeholder="Min" step="0.1" type="number">
