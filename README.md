@@ -14,7 +14,7 @@ Browser extension that automates high-volume actions on X (formerly Twitter): ma
 - **Unlocked feature set**: All automation capabilities are available without activation keys or remote license checks.
 
 ## Project Layout
-```
+```text
 app.js              # Background/page-level instrumentation shared via web-accessible resource
 content.js          # Content script injected on https://x.com/*
 options.html|js|css # Extension options UI
@@ -49,9 +49,10 @@ vitest.config.js    # Vitest configuration w/ jsdom environment & coverage setti
    ```
 
 ## Permissions & Runtime Behavior
+
 | Permission | Why it is needed |
 |------------|------------------|
-| `storage`, `unlimitedStorage` | Persist autopilot configuration and execution history in `chrome.storage.sync` with local fallbacks.
+| `storage`, `unlimitedStorage` | Persist autopilot configuration and execution history in `chrome.storage.sync` with local fallbacks. |
 
 Additional resources:
 - Content script targets `https://x.com/*` and runs at `document_end` to access dynamic timelines safely.
