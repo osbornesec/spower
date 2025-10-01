@@ -11,6 +11,7 @@ Browser extension that automates high-volume actions on X (formerly Twitter): ma
 - **Runtime telemetry**: Background `XMLHttpRequest` wrapper (`app.js`) emits request metadata to the page for debugging and throttling safeguards.
 - **Configurable UI**: Options page (`options.html/.js/.css`) persists settings via Chrome storage (sync + local fallbacks) with live validation.
 - **In-app promotions**: Content script (`content.js`) renders contextual ads for related extensions and handles timeline parsing.
+- **Unlocked feature set**: All automation capabilities are available without activation keys or remote license checks.
 
 ## Project Layout
 ```
@@ -50,7 +51,7 @@ vitest.config.js    # Vitest configuration w/ jsdom environment & coverage setti
 ## Permissions & Runtime Behavior
 | Permission | Why it is needed |
 |------------|------------------|
-| `storage`, `unlimitedStorage` | Persist autopilot configuration, activation keys, and execution history in `chrome.storage.sync` with local fallbacks.
+| `storage`, `unlimitedStorage` | Persist autopilot configuration and execution history in `chrome.storage.sync` with local fallbacks.
 
 Additional resources:
 - Content script targets `https://x.com/*` and runs at `document_end` to access dynamic timelines safely.

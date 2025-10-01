@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial documentation set (`README`, `docs/*`) describing architecture, testing, security, and contributor guidance.
 - CHANGELOG scaffold for future release tracking.
+### Changed
+- Removed remote PRO activation checks; all automation features are now available without license keys.
 
 ## [1.0.0] - 2025-02-14
 ### Added

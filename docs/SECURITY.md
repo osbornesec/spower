@@ -7,13 +7,13 @@ This project automates account actions on X (Twitter). Please handle credentials
 - Do not open public issues for sensitive findings. You will receive acknowledgement within five business days.
 
 ## Data & Permissions
-- The extension requests `storage` and `unlimitedStorage` to persist autopilot queues, activation keys, and execution counters.
-- No external host permissions are declared; network requests target `https://x.com/*` (the active tab) and vendor APIs configured within the code (see `options.js` for activation flows).
+- The extension requests `storage` and `unlimitedStorage` to persist autopilot queues and execution counters.
+- No external host permissions are declared; automation operates solely on `https://x.com/*` and does not perform remote license checks.
 - Telemetry posted via `window.postMessage` stays within the page context; no remote logging is performed by default.
 
 ## Threat Model Highlights
 - **Account safety**: Bulk actions risk triggering platform anti-spam controls. Respect idle timers and limits configured in the options page.
-- **Local storage**: Activation keys and configuration are stored in Chrome sync; compromise of the host machine can expose them.
+- **Local storage**: Configuration is stored in Chrome sync; compromise of the host machine can expose automation settings.
 - **Script injection**: The content script injects `app.js` as a web-accessible resource. Keep this file free from third-party dependencies and review changes carefully.
 
 ## Hardening Recommendations

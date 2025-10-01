@@ -42,7 +42,7 @@ npm run test:coverage
 
 ## 6. Open the Options Page
 - From the extension card, click **Details → Extension options** or visit `chrome-extension://<extension-id>/options.html`.
-- Configure autopilot actions, limits, and activation key settings. Values persist via `chrome.storage.sync` with local fallbacks.
+- Configure autopilot actions and limits. Values persist via `chrome.storage.sync` with local fallbacks.
 
 ## 7. Start Experimenting on X (Twitter)
 - Navigate to `https://x.com/`.
