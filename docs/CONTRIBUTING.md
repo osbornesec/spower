@@ -4,7 +4,7 @@ Thank you for helping improve Superpowers for Twitter. This document outlines th
 
 ## Development Workflow
 1. **Fork & clone** the repository.
-2. Create a feature branch: `git switch -c feat/short-description` (use kebab-case or slash-delimited prefixes).
+2. Create a feature branch: `git switch -c feat/short-description` (use slash-delimited prefixes with kebab-case descriptors, e.g. `feat/unlock-autopilot`).
 3. Install dependencies with `npm install` (or `npm ci`).
 4. Run `npm test` before opening a pull request.
 5. Keep changes focused—prefer additive commits (docs, tests, configuration) over bulk refactors.

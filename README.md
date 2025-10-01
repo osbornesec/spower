@@ -80,7 +80,7 @@ Additional resources:
 - Security reporting guidance lives in `docs/SECURITY.md`.
 
 ## License
-`package.json` declares the ISC license. Add a `LICENSE` file before distributing binaries to ensure recipients receive the full text.
+Released under the [ISC License](LICENSE); include this file in any redistributed packages.
 
 ## Assumptions & Future Work
 - Assumes Chrome/Chromium distribution; Firefox compatibility is not validated.

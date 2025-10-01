@@ -3,7 +3,7 @@
 This project automates account actions on X (Twitter). Please handle credentials and automation carefully.
 
 ## Reporting Vulnerabilities
-- Email **security@osbornesec.dev** with details. Include reproduction steps, browser version, and whether the issue affects stored data, API usage, or automation behaviour.
+- Email **<security@osbornesec.dev>** with details. Include reproduction steps, browser version, and whether the issue affects stored data, API usage, or automation behaviour.
 - Do not open public issues for sensitive findings. You will receive acknowledgement within five business days.
 
 ## Data & Permissions

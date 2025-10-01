@@ -74,7 +74,7 @@ describe('app.js XMLHttpRequest instrumentation', () => {
 
     expect(window.postMessage).toHaveBeenCalledTimes(1);
     const [message, target] = window.postMessage.mock.calls[0];
-    expect(target).toBe('*');
+    expect(target).toBe(window.location.origin);
     expect(message).toEqual({
       body: 'payload',
       origin: window.location.href.toUpperCase(),
@@ -90,7 +90,7 @@ describe('app.js XMLHttpRequest instrumentation', () => {
 
     expect(XMLHttpRequest.prototype.open).toBe(originalOpen);
 
-    vi.advanceTimersByTime(30);
+    vi.advanceTimersByTime(150);
 
     expect(XMLHttpRequest.prototype.open).not.toBe(originalOpen);
 
