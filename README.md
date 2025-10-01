@@ -1,0 +1,87 @@
+# Superpowers for Twitter (spower)
+
+![License](https://img.shields.io/badge/license-ISC-brightgreen)
+![Node](https://img.shields.io/badge/node-%E2%89%A518.x-blue)
+![Tests](https://img.shields.io/badge/tests-vitest-purple)
+
+Browser extension that automates high-volume actions on X (formerly Twitter): mass follow/unfollow, like/unlike, retweet/unretweet, and configurable autopilot routines. This repository hosts the unpacked extension source and a Vitest-powered test harness for development and maintenance.
+
+## Features
+- **Autopilot actions**: Queue follow, unfollow, like, and retweet jobs with per-action limits, idle delays, and repeat intervals.
+- **Runtime telemetry**: Background `XMLHttpRequest` wrapper (`app.js`) emits request metadata to the page for debugging and throttling safeguards.
+- **Configurable UI**: Options page (`options.html/.js/.css`) persists settings via Chrome storage (sync + local fallbacks) with live validation.
+- **In-app promotions**: Content script (`content.js`) renders contextual ads for related extensions and handles timeline parsing.
+
+## Project Layout
+```
+app.js              # Background/page-level instrumentation shared via web-accessible resource
+content.js          # Content script injected on https://x.com/*
+options.html|js|css # Extension options UI
+images/             # Icons & UI affordances (spinner/check)
+AGENTS.md           # Contributor quick reference
+docs/               # Extended documentation (getting started, architecture, testing, contributing, security)
+manifest.json       # MV3 manifest (permissions, scripts, resources)
+package.json        # npm scripts and devDependencies
+tests/              # Vitest suites covering xhr hooks and utility helpers
+vitest.config.js    # Vitest configuration w/ jsdom environment & coverage settings
+```
+
+## Get Started Quickly
+1. **Clone & install** (macOS/Linux/Windows via Git Bash or WSL):
+   ```bash
+   git clone https://github.com/osbornesec/spower.git
+   cd spower
+   npm install
+   ```
+2. **Run tests** (ensures setup works):
+   ```bash
+   npm test
+   ```
+3. **Load in Chrome/Chromium**:
+   - Open `chrome://extensions`.
+   - Toggle **Developer mode** (top-right).
+   - Click **Load unpacked** and select the repo root (`spower`).
+   - Confirm "Superpowers for Twitter" appears with options page available.
+4. **Optional – Coverage report**:
+   ```bash
+   npm run test:coverage
+   ```
+
+## Permissions & Runtime Behavior
+| Permission | Why it is needed |
+|------------|------------------|
+| `storage`, `unlimitedStorage` | Persist autopilot configuration, activation keys, and execution history in `chrome.storage.sync` with local fallbacks.
+
+Additional resources:
+- Content script targets `https://x.com/*` and runs at `document_end` to access dynamic timelines safely.
+- `app.js` is exposed as a web-accessible resource for injected telemetry helpers.
+
+## Testing & Tooling
+- Framework: [Vitest](https://vitest.dev/) + jsdom (`npm test`).
+- Coverage: `npm run test:coverage` (V8 provider). Coverage currently excludes legacy minified bundles; raise thresholds as modules are refactored.
+- Support libraries: `@testing-library/dom` & `@testing-library/jest-dom` for DOM assertions.
+- See `docs/TESTING.md` for advanced patterns (watch mode, DOM stubs).
+
+## Development Workflow
+- Use Node.js 18 LTS or newer (tested with npm 9+).
+- Modify options UX via `options.*` and keep icons in `images/`.
+- Document architecture or feature decisions in `docs/ARCHITECTURE.md`.
+- Follow commit/PR guidelines in `docs/CONTRIBUTING.md`.
+
+## Troubleshooting
+- **Extension fails to load**: verify `manifest.json` version is MV3 and the directory contains `manifest.json` at root.
+- **Tests hang**: ensure no stray real timers; Vitest suite uses fake timers—reset stubbed globals in new tests.
+- **Settings not persisting**: sync quota exceeded; check console for `chrome.runtime.lastError`, storage falls back to `chrome.storage.local`.
+
+## Contributing & Support
+- Read `AGENTS.md` for quick contributor onboarding.
+- File issues or feature requests via the GitHub issue tracker. Include browser version, reproduction steps, and whether autopilot or single-action mode was used.
+- Security reporting guidance lives in `docs/SECURITY.md`.
+
+## License
+`package.json` declares the ISC license. Add a `LICENSE` file before distributing binaries to ensure recipients receive the full text.
+
+## Assumptions & Future Work
+- Assumes Chrome/Chromium distribution; Firefox compatibility is not validated.
+- Testing documentation presumes npm (`npm install`); if your environment requires `npm ci`, adjust accordingly.
+- Future work: factor `content.js` into modules for richer test coverage and publish release packaging steps.
