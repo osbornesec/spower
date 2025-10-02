@@ -1,11 +1,19 @@
 {
    "author": "Clemens Teichmann",
-   "content_scripts": [ {
-      "css": [ "content.css" ],
-      "js": [ "content.js" ],
-      "matches": [ "https://x.com/*" ],
-      "run_at": "document_end"
-   } ],
+   "content_scripts": [
+      {
+         "css": [
+            "content.css"
+         ],
+         "js": [
+            "content.js"
+         ],
+         "matches": [
+            "https://x.com/*"
+         ],
+         "run_at": "document_end"
+      }
+   ],
    "description": "Mass follow, mass unfollow, mass like, mass unlike, mass retweet and mass unretweet on Twitter with powerful options.",
    "homepage_url": "https://www.clemensteichmann.com/superpowers-for-twitter",
    "icons": {
@@ -17,11 +25,21 @@
    "manifest_version": 3,
    "name": "Superpowers for Twitter",
    "options_page": "options.html",
-   "permissions": [ "storage", "unlimitedStorage" ],
+   "permissions": [
+      "storage",
+      "unlimitedStorage"
+   ],
    "update_url": "https://clients2.google.com/service/update2/crx",
    "version": "88",
-   "web_accessible_resources": [ {
-      "matches": [ "https://x.com/*" ],
-      "resources": [ "app.js" ]
-   } ]
+   "web_accessible_resources": [
+      {
+         "matches": [
+            "https://x.com/*"
+         ],
+         "resources": [
+            "app.js",
+            "utils/perf.js"
+         ]
+      }
+   ]
 }

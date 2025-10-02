@@ -86,18 +86,43 @@ describe('app.js XMLHttpRequest instrumentation', () => {
 
   it('reapplies instrumentation if the open method is overwritten', () => {
     const originalOpen = FakeXMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = originalOpen;
+    const hijackedOpen = function hijackedOpen() {
+      return originalOpen.apply(this, arguments);
+    };
+    XMLHttpRequest.prototype.open = hijackedOpen;
 
-    expect(XMLHttpRequest.prototype.open).toBe(originalOpen);
+    expect(XMLHttpRequest.prototype.open).toBe(hijackedOpen);
 
     vi.advanceTimersByTime(150);
 
-    expect(XMLHttpRequest.prototype.open).not.toBe(originalOpen);
+    expect(XMLHttpRequest.prototype.open).not.toBe(hijackedOpen);
 
     const request = new XMLHttpRequest();
     request.open('GET', '/resource');
 
     expect(request.origin).toBe(window.location.href.toUpperCase());
     expect(request.url).toBe('/resource');
+  });
+
+  it('includes the active home tab label in the origin key', () => {
+    const originalLocation = global.location;
+    global.location = { href: 'https://x.com/home', pathname: '/home' };
+
+    const tablist = document.createElement('div');
+    tablist.setAttribute('role', 'tablist');
+    const tab = document.createElement('button');
+    tab.setAttribute('role', 'tab');
+    tab.setAttribute('aria-selected', 'true');
+    tab.textContent = 'Vibe Coding';
+    tablist.appendChild(tab);
+    document.body.appendChild(tablist);
+
+    const request = new XMLHttpRequest();
+    request.open('GET', '/resource');
+
+    expect(request.origin).toBe('HTTPS://X.COM/HOME::VIBE CODING');
+
+    document.body.removeChild(tablist);
+    global.location = originalLocation;
   });
 });
