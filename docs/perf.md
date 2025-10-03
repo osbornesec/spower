@@ -17,6 +17,9 @@
 | --- | --- | --- | --- |
 | Baseline (`HEAD`) | 21.16, 21.23, 21.87, 21.96, 25.08 | **21.87 ms** | 22.26 ms |
 | Optimized (`content.js`) | 20.61, 21.60, 21.69, 21.98, 23.49 | **21.69 ms** | 21.87 ms |
+| Baseline (`HEAD`)             | 21.16, 21.23, 21.87, 21.96, 25.08 | **21.87 ms** | 22.26 ms |
+| Optimized (`content.js`)      | 20.61, 21.60, 21.69, 21.98, 23.49 | **21.69 ms** | 21.87 ms |
+
 The optimized startup stays well below the 50 ms target while retaining deterministic behaviour.
 
 
