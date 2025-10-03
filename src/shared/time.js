@@ -21,7 +21,6 @@ export const formatDurationWithMillis = (milliseconds) => {
   const secondsPortion = (safeMillis - remainingMillis) / 1_000;
   return `${formatDuration(secondsPortion)}.${String(remainingMillis).padStart(3, '0')}`;
 };
-};
 
 const ONE_DAY_MILLIS = 24 * 60 * 60 * 1_000;
 

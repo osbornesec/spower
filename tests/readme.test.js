@@ -1,13 +1,17 @@
-const { describe, it, expect, beforeAll } = require('vitest');
-const { readFileSync, existsSync } = require('fs');
-const { resolve } = require('path');
+import { describe, it, expect, beforeAll } from 'vitest';
+import { readFileSync, existsSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const currentDir = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(currentDir, '..');
 
 describe('README.md Validation', () => {
   let readmeContent;
   let readmeLines;
 
   beforeAll(() => {
-    const readmePath = resolve(__dirname, '../README.md');
+    const readmePath = resolve(repoRoot, 'README.md');
     readmeContent = readFileSync(readmePath, 'utf-8');
     readmeLines = readmeContent.split('\n');
   });
@@ -255,7 +259,7 @@ describe('README.md Validation', () => {
         if (path.startsWith('#')) return;
 
         if (!path.startsWith('http')) {
-          const fullPath = resolve(__dirname, '..', path);
+          const fullPath = resolve(repoRoot, path);
           expect(existsSync(fullPath)).toBe(true);
         }
       });
