@@ -131,9 +131,9 @@ import {
     const e = sleep;
     const t = SUSPENDED_AUTOPILOT_KEY;
     const n = () => getSuspendedAutopilotActions(); /**
-     * Appends the current global `wi.type` to the array returned by `n()` and persists the result to sessionStorage under the key `t`.
+     * Append the current global autopilot action type to the suspended-actions list.
      *
-     * If the global `wi` is not an object, the function is a no-op.
+     * If the global `wi` is an object, its `type` is added to the suspended-autopilot actions and the updated list is persisted to sessionStorage under the key `t`. If `wi` is not an object, the function does nothing.
      */
     function i() {
       if ('object' != typeof wi) return;
@@ -143,9 +143,9 @@ import {
       l = ({ text: e, title: t, action: n }) =>
         `\n    <div class="sft-ad animated fadeInRight">\n      <div class="sft-ad__title">${t}</div>\n      <div class="sft-ad__text">${e}</div>\n      <a class="sft-ad__action" href="${n.url}" target="_blank">${n.text}</a>\n    </div>\n  `,
       a = document.createElement('div'); /**
-     * Hide the DOM element referenced by `a`.
+     * Hides the DOM element referenced by the global variable `a`.
      *
-     * Sets the element's display style to `"none"`, removing it from layout and visual rendering.
+     * Sets the element's inline `display` style to `"none"`, removing it from layout and visual rendering.
      */
     function s() {
       a.style.display = 'none';
@@ -162,21 +162,19 @@ import {
       spwIdleInit(() => spwBody.appendChild(a)));
     const u = document.createElement('div');
     let w; /**
-     * Set the global variable `w` to "follow".
+     * Set the global action mode to "follow".
      */
     function f() {
       w = 'follow';
     } /**
-     * Set the current mass-action mode to unfollow.
+     * Select the "unfollow" mass-action mode.
      *
-     * Sets the global action-mode variable `w` to the string `"unfollow"`.
+     * Updates the module's current mass-action mode to "unfollow".
      */
     function d() {
       w = 'unfollow';
     } /**
-     * Set the global action flag to "like".
-     *
-     * Sets the global variable `w` to the string `"like"`.
+     * Selects "like" as the current global autopilot action.
      */
     function m() {
       w = 'like';
@@ -188,22 +186,22 @@ import {
     function p() {
       w = 'retweet';
     } /**
-     * Set the global action mode to "unretweet".
+     * Set the module's current action mode to "unretweet".
      *
-     * This assigns the global variable `w` the value `"unretweet"`, selecting the unretweet action for subsequent logic.
+     * Updates the internal action selector so subsequent operations use the unretweet flow.
      */
     function y() {
       w = 'unretweet';
     } /**
-     * Set the global action marker to "unlike".
+     * Set the current global autopilot action to "unlike".
      *
-     * This assigns the string "unlike" to the global variable `w`.
+     * Updates the module-scoped marker so subsequent logic treats the active action as an unlike operation.
      */
     function g() {
       w = 'unlike';
     } /**
-     * Update the status element to show a countdown message for resuming the autopilot.
-     * @param {number} e - Remaining time in milliseconds to display in the countdown.
+     * Set the status element text to a message showing the remaining countdown until autopilot resumes.
+     * @param {number} e - Milliseconds remaining until autopilot resumes.
      */
     function k(e) {
       u.textContent = buildResumeAutopilotMessage(e);
@@ -313,10 +311,13 @@ import {
      */
     const M = parseTimelineTweets;
     const I = poll; /**
-     * Create a Promise and invoke the shared poll helper with the provided arguments plus the promise's resolve and reject callbacks.
-     * @param {*} e - First value forwarded to the poll resolver.
-     * @param {*} t - Second value forwarded to the poll resolver.
-     * @returns {Promise<*>} A promise that resolves or rejects via the callbacks passed to the polling helper.
+     * Return a promise that will be settled by a polling routine invoked with the given arguments.
+     *
+     * Invokes the polling function with `e`, `t`, and the promise's `resolve`/`reject` callbacks so the promise
+     * resolves or rejects according to the polling routine's outcome.
+     * @param {*} e - First value forwarded to the polling routine.
+     * @param {*} t - Second value forwarded to the polling routine.
+     * @returns {Promise<*>} A promise that resolves with the polling routine's success value or rejects with its error.
      */
     function E(e, t) {
       return new Promise((n, i) => {
@@ -433,16 +434,16 @@ import {
     function N(e) {
       return 1 == e.is_blue_verified;
     } /**
-     * Retrieve the description from an object's legacy field.
-     * @param {Object} e - Source object containing a `legacy` object with description data.
-     * @returns {string|undefined} The legacy description string if present, `undefined` otherwise.
+     * Get the legacy description string from an object.
+     * @param {Object} e - Object that may contain a `legacy` property.
+     * @returns {string|undefined} The value of `e.legacy.description` if present, `undefined` otherwise.
      */
     function X(e) {
       return F(e.legacy, 'description');
     } /**
-     * Create a profile path by prefixing the user's handle with a '/'.
-     * @param {any} e - User object or username string from which the handle will be derived.
-     * @returns {string} The profile path in the form '/handle'.
+     * Build a profile path by prefixing a user's handle with a forward slash.
+     * @param {any} e - A username string or a user object from which the handle is resolved.
+     * @returns {string} The profile path, e.g. "/handle".
      */
     function H(e) {
       return `/${P(e)}`;
@@ -457,9 +458,9 @@ import {
         return void 0;
       }
     }; /**
-     * Retrieve the legacy "lang" value from an object.
-     * @param {Object} e - Object expected to contain a `legacy` property.
-     * @returns {string|undefined} The `legacy.lang` value if present, otherwise `undefined`.
+     * Get the legacy language code from an object.
+     * @param {Object} e - Object that may contain a `legacy` property with language info.
+     * @returns {string|undefined} The value of `legacy.lang` if present, `undefined` otherwise.
      */
     function Q(e) {
       return F(e.legacy, 'lang');
@@ -471,9 +472,9 @@ import {
     function K(e) {
       return F(e.legacy, 'favorite_count');
     } /**
-     * Determine whether a tweet object is marked as favorited.
-     * @param {Object} e - Tweet-like object containing a `legacy` field with `favorited`.
-     * @returns {boolean} `true` if `e.legacy.favorited` equals 1, `false` otherwise.
+     * Check whether a tweet object is marked as favorited.
+     * @param {Object} e - Tweet-like object containing a `legacy` field with a `favorited` property.
+     * @returns {boolean} `true` if `e.legacy.favorited` is `1`, `false` otherwise.
      */
     function Y(e) {
       return 1 == e.legacy.favorited;
@@ -485,7 +486,7 @@ import {
     function z(e) {
       return 'string' == typeof e.legacy.in_reply_to_status_id_str;
     } /**
-     * Determines whether a tweet-like payload contains a legacy `retweeted_status_result` object.
+     * Check if a tweet-like payload includes a legacy `retweeted_status_result` object.
      * @param {object} e - Payload expected to include a `legacy` property.
      * @returns {boolean} `true` if `e.legacy.retweeted_status_result` is an object, `false` otherwise.
      */
@@ -551,9 +552,11 @@ import {
       (re.src = chrome.runtime.getURL('app.js')),
       document.documentElement.appendChild(re));
     const ce = {}; /**
-     * Registers a listener for a given key in the internal registry.
-     * @param {string} e - The registry key or event name.
-     * @param {Function} t - The listener or handler to register for the key.
+     * Register a listener for the specified registry key so it will be invoked for that event.
+     *
+     * Multiple listeners may be registered for the same key; they are invoked in registration order.
+     * @param {string} e - Registry key or event name to attach the listener to.
+     * @param {Function} t - Listener function to register.
      */
     function ue(e, t) {
       ((ce[e] = ce[e] || []), ce[e].push(t));
@@ -592,9 +595,8 @@ import {
       qn,
       Un = false,
       Pn = false; /**
-     * Invoke the shared action dispatcher with the provided callback.
-     * @param {Function} e - Callback passed to the dispatcher.
-     * @returns {*} The value returned by the dispatcher `U` when invoked with the callback and UI helpers.
+     * Run the shared action dispatcher using the provided per-item callback and built-in UI/list helpers.
+     * @param {Function} e - Callback invoked by the dispatcher for each focused item; receives the current element and action context.
      */
     async function me(e) {
       await U({ callback: e, getFocusableEl: resolveTweetStatusLink, getList: de });
@@ -667,10 +669,9 @@ import {
       ue('/Retweeters', ({ origin: e, parsedResponse: t }) => Fe(e, he(e, t))),
       ue('i/api/graphql', ({ origin: e, parsedResponse: t }) => Fe(e, he(e, t))));
     const xe = () => be[spwCurrentPageKey()]; /**
-     * Execute a callback within the focus/list processing context.
+     * Invoke a callback for each item in the current focus/list processing context.
      * @param {Function} e - Callback invoked for each processed item; receives the current list item or its focusable element.
-     * @param {Function} [t=resolveProfileLink] - Function that resolves a focusable element for a given item.
-     * @returns {*} The value produced by executing the callback in the current focus/list context.
+     * @param {Function} [t=resolveProfileLink] - Resolver that maps a list item to a focusable element; defaults to `resolveProfileLink`.
      */
     async function Re(e, t = resolveProfileLink) {
       await U({ callback: e, getFocusableEl: t, getList: xe });
@@ -690,10 +691,8 @@ import {
       ue('/TopicLandingPage', ({ origin: e, parsedResponse: t }) => Se(e, M(t))),
       ue('i/api/graphql', ({ origin: e, parsedResponse: t }) => Se(e, M(t))));
     const ve = () => Le[spwCurrentPageKey()]; /**
-     * Invoke the provided callback through the action executor, giving it access to the page's focusable element and list providers.
-     *
-     * @param {Function} e - Callback to execute; its return value is propagated back to the caller.
-     * @returns {Promise<*>} The value returned by the callback, or `undefined` if the callback does not return a value.
+     * Execute a callback via the action executor, supplying the page focusable-element resolver and list provider.
+     * @param {Function} e - Callback to invoke within the executor; its return value is not propagated by this wrapper.
      */
     async function Te(e) {
       await U({ callback: e, getFocusableEl: resolveTweetStatusLink, getList: ve });
@@ -711,8 +710,9 @@ import {
       })(e, M(t)),
     );
     const $e = () => _e[spwCurrentPageKey()]; /**
-     * Execute the generic item-iteration routine using the provided callback.
-     * @param {Function} e - Callback invoked for each retrieved focusable item; receives the item-specific arguments required by the caller.
+     * Iterate over the page's focusable items and invoke the given callback for each one.
+     *
+     * @param {Function} e - Callback invoked for each focusable item; receives the item element and any item-specific context provided by the runner.
      */
     async function Me(e) {
       await U({ callback: e, getFocusableEl: resolveTweetStatusLink, getList: $e });
@@ -730,9 +730,8 @@ import {
       })(e, M(t)),
     );
     const Ee = () => Ie[spwCurrentPageKey()]; /**
-     * Execute a callback using the module's list and focus helpers.
-     * @param {Function} e - Callback to execute; called by the underlying operation for each relevant item.
-     * @returns {*} The value returned by the underlying operation.
+     * Invoke a callback for each focusable tweet element using the module's list and focus helpers.
+     * @param {Function} e - Callback invoked for each focusable element retrieved from the module list.
      */
     async function Ae(e) {
       await U({ callback: e, getFocusableEl: resolveTweetStatusLink, getList: Ee });
@@ -765,7 +764,7 @@ import {
     const Ue = window.indexedDB.open('MassFollowForTwitter', 8);
     let Pe; /**
      * Add a record to the specified IndexedDB object store.
-     * @param {string} storeName - Name of the object store to write to.
+     * @param {string} storeName - The name of the object store to write to.
      * @param {*} record - The record to add to the store.
      */
     function je(e, t) {
@@ -807,10 +806,9 @@ import {
         Pe = e.target.result;
       }));
     const We = 'likeRecord'; /**
-     * Get how many records exist for the given tweet identifier in the IndexedDB store.
-     *
+     * Count persisted records for a tweet identifier in the IndexedDB store.
      * @param {string|number} e - The tweet identifier to count records for.
-     * @returns {number} The count of records that match the provided tweet identifier.
+     * @returns {number} The number of records matching the tweet identifier.
      */
     function Oe(e) {
       return (function (e, t, n) {
@@ -825,10 +823,10 @@ import {
         });
       })(We, 'tweetUserId', le(e));
     } /**
-     * Checks whether `t` includes the value produced by calling `Q` with `e`.
-     * @param {*} e - Value passed to `Q`.
+     * Determines whether `t` contains the value obtained by applying the transformation function `Q` to `e`.
+     * @param {*} e - Input value that will be transformed by `Q`.
      * @param {string|Array} t - String or array to test for inclusion.
-     * @returns {boolean} `true` if `t` includes `Q(e)`, `false` otherwise.
+     * @returns {boolean} `true` if `t` contains `Q(e)`, `false` otherwise.
      */
     function Ge(e, t) {
       return t.includes(Q(e));
@@ -865,58 +863,60 @@ import {
         }
         Qe();
       }; /**
-     * Log a value to the console and emit a success notification for it.
-     * @param {*} e - The message or payload to log and notify as a successful event.
+     * Log a value to the console and show it as a success notification.
+     * @param {*} e - The message or payload to display in the console and notification.
      */
     function Ye(e) {
       (console.log(e), Ke(e, 'success'));
     } /**
-     * Display a warning message and log it to the console.
-     * @param {any} e - The warning content to log and present in the UI.
+     * Show a warning message in the UI and also log it to the console.
+     * @param {any} e - The message or object to display and log as a warning.
      */
     function ze(e) {
       (console.log(e), Ke(e, 'warning'));
     } /**
-     * Set the internal `Je` reference to the provided value.
-     * @param {*} e - The value to assign to the internal `Je` variable.
+     * Set the module's internal Je reference.
+     * @param {*} e - The value to assign to the internal Je reference.
      */
     function Ze(e) {
       Je = e;
     } /**
-     * Adds a status entry derived from `e` to the status log and displays `t` as a transient notification.
-     * @param {*} e - Data used to build the status entry.
-     * @param {string} t - Text to display as a notification.
+     * Add a status entry derived from the given tweet data and show a transient notification.
+     * @param {*} e - Tweet element or tweet data used to build the status log entry.
+     * @param {string} t - Notification text to display transiently.
      */
     function et(e, t) {
       (Ze(resolveTweetFooter(e)), ze(t));
     } /**
-     * Update the status display with a formatted value and show a notification message.
-     * @param {string|any} e - Value to format and set as the current status label.
-     * @param {string} t - Message to display as a user notification.
+     * Set the status label and display a notification message.
+     * @param {string|any} e - Value to display as the status label; non-string values will be coerced to text.
+     * @param {string} t - Notification message text to show to the user.
      */
     function tt(e, t) {
       (Ze(resolveTweetFooter(e)), Ye(t));
     }
     const nt = 'v2FollowRecord'; /**
-     * Delete a record from the default IndexedDB object store using a composite key.
-     * @param {*} e - The record identifier used as the second element of the composite key ([L(), e]).
+     * Delete a record from the default IndexedDB object store using a composite key composed of the current session key and the provided identifier.
+     * @param {*} e - The identifier used as the second element of the composite key ([currentSessionKey, e]).
      */
     function it(e) {
       return (function (e, t) {
         Pe.transaction([e], 'readwrite').objectStore(e).delete(t);
       })(nt, [L(), e]);
     } /**
-     * Create and persist a follow-record entry for the given entity.
+     * Record and persist a follow action for the specified entity.
      *
-     * @param {Object|string|number} e - Entity or identifier used to resolve the target restId.
-     * @returns {*} The result of writing the follow record to the database.
+     * Resolves the provided entity to a target REST ID and writes a follow-record to the follow store.
+     *
+     * @param {Object|string|number} e - Entity object or identifier used to resolve the target REST ID.
+     * @returns {*} The result of writing the follow record to storage.
      */
     function ot(e) {
       return Be(nt, [L(), V(e)]);
     } /**
-     * Retrieve the stored follow record for a user or entity.
-     * @param {*} e - A user object or identifier; the function will resolve the entity's stored key.
-     * @returns {*} The follow record for the resolved entity, or `undefined` if none exists.
+     * Get the stored follow record for a user or entity.
+     * @param {*} e - A user object or identifier used to resolve the stored entity key.
+     * @returns {*} The follow record for the resolved entity, or `undefined` if not found.
      */
     function lt(e) {
       return Be('followRecord', V(e));
@@ -1006,15 +1006,14 @@ import {
         (await Vn(i), Qe());
       } else n && et(e, n);
     }; /**
-     * Start a mass "like" operation using current saved settings, applying optional overrides.
+     * Start a mass-like operation using stored like settings, applying optional overrides.
      *
-     * Applies saved like-related configuration, accepts optional overrides for the like limit and pacing,
-     * adapts the configuration for the active page/context, and dispatches the appropriate context-specific
-     * processor to perform the like actions.
+     * Applies normalized like configuration for the current page context and dispatches the context-specific
+     * processor to perform like actions. Optional parameters override the stored like limit and per-action pause.
      *
      * @param {number} [limit] - Optional override for the maximum number of likes to perform.
-     * @param {number} [pause] - Optional override for the per-action pause/delay value.
-     * @returns {Promise<void>} Resolves when the mass-like operation completes or is scheduled for the current context.
+     * @param {number} [pause] - Optional override for the per-action pause/delay (seconds).
+     * @returns {Promise<void>} Completes when the mass-like operation finishes or is scheduled for the current context.
      */
     async function dt(e, t) {
       const n = await normalizeLikeConfig();
@@ -1102,10 +1101,13 @@ import {
         (await Vn(i), Qe());
       } else n && et(e, n);
     }; /**
-     * Configure and start a mass-retweet operation using stored settings and optional overrides.
-     * @param {number} [limit] - Optional override for the maximum number of retweets to perform.
-     * @param {number} [delay] - Optional override for the delay/pause between retweet attempts (milliseconds).
-     * @returns {Promise<void>} Resolves when the configured retweet operation has finished initializing and any scheduled processing completes.
+     * Start a mass-retweet operation using stored settings and optional overrides.
+     *
+     * Loads the stored retweet configuration, applies the provided overrides (maximum retweets and inter-attempt delay),
+     * configures pause behavior when unable to retweet, and initiates the mass-retweet runner appropriate for the current page context.
+     *
+     * @param {number} [limit] - Override for the maximum number of retweets to perform.
+     * @param {number} [delay] - Override for the delay between retweet attempts, in milliseconds.
      */
     async function ht(e, t) {
       const n = await normalizeRetweetConfig();
@@ -1157,8 +1159,8 @@ import {
     function St(e) {
       return e.split(',').map((e) => e.trim().toUpperCase());
     } /**
-     * Checks whether a text contains the target user's uppercase @mention.
-     * @param {*} e - Source value from which the username is derived (e.g., a user object or identifier).
+     * Determines whether a text contains the target user's @mention in uppercase.
+     * @param {*} e - Value used to derive the username (e.g., a user object or username string).
      * @param {string} t - The text to search for the @mention.
      * @returns {boolean} `true` if `t` contains an `@` followed by the derived username converted to uppercase, `false` otherwise.
      */
@@ -1257,12 +1259,14 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
         return !0;
       }
     } /**
-     * Attempts to follow the account associated with the provided tweet item when allowed by language and action guards.
+     * Attempt to follow the account referenced by the provided tweet item when eligibility checks allow it.
      *
-     * Performs in-page interactions to locate and click the follow control, updates internal follow state, and delays according to the configured interval. If the tweet's language is not whitelisted or other guard checks fail, records the reason and waits a short backoff.
+     * Performs necessary in-page interactions to locate and click the follow control, updates internal follow records on success, and waits for an interval or short backoff depending on outcome.
      *
-     * @param {Object} e - Tweet item container object; expected to include DOM references (e.g., `focusableEl`) and identifiers used to resolve the target account.
-     * @param {Object} t - Options object. Recognized properties include `tweetLanguageWhitelist` (allowed languages) and `intervalDurationRange` (used to compute follow delay).
+     * @param {Object} e - Tweet item container; must include DOM references (e.g., `focusableEl`) and identifiers used to resolve the target account.
+     * @param {Object} t - Options object.
+     * @param {Array<string>} [t.tweetLanguageWhitelist] - Allowed tweet languages; when present, tweets whose language is not in this list are skipped.
+     * @param {Array<number>} [t.intervalDurationRange] - Two-element range [minSeconds, maxSeconds] used to compute the delay after a successful follow.
      */
     async function $t(e, t) {
       let n;
@@ -1363,12 +1367,12 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
           e
         );
       }; /**
-     * Starts and orchestrates the "follow all" mass-follow operation using current settings and optional overrides.
+     * Orchestrates a mass "follow" operation using stored settings and optional overrides.
      *
-     * Applies configured follow limits and daily limits, checks and sets pause/limit flags, chooses the appropriate navigation/interact strategy based on the current page/context, performs follow actions with pacing, and emits UI notifications and persistence updates for each result.
+     * Applies per-run and daily follow limits, enforces pause/limit state, chooses the appropriate navigation and interaction strategy for the current page context, performs follow attempts with configured pacing, updates UI and persistence for each result, and honors pause-after-skip intervals when provided.
      *
-     * @param {?number|Object} e - Optional override for follow limits or an options object that can modify follow behavior (e.g., follow limit, interval ranges, pause-after-skip). If a number is provided it is treated as a follow limit.
-     * @param {?any} t - Optional target or context hint used to focus or scope the follow operation (for example a specific item, element, or route marker); when present it is applied to the operation before actions begin.
+     * @param {?number|Object} e - Follow limit override or an options object (may include `followLimit`, `intervalDurationRange`, `pauseAfterSkipRange`, etc.). When a number is provided it is treated as a follow limit.
+     * @param {?any} t - Optional target or context hint (for example a specific item, element, or route marker) used to focus or scope the follow operation before actions begin.
      */
     async function Ct(e, t) {
       const n = await At();
@@ -1459,9 +1463,9 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
       (f(), qt(), pt(), Rt(), await Ct());
     });
     const Ut = 864e5; /**
-     * Compute the elapsed time since a given timestamp, expressed in the module's time units.
-     * @param {number} e - Start timestamp (milliseconds since epoch).
-     * @returns {number} The elapsed time from `e` to now, divided by `Ut`.
+     * Compute elapsed time since the given timestamp, expressed in the module's time unit.
+     * @param {number} e - Start timestamp in milliseconds since the Unix epoch.
+     * @returns {number} The elapsed time from `e` to now, measured in units of `Ut` (i.e. `(Date.now() - e) / Ut`).
      */
     function daysSince(e) {
       return (Date.now() - e) / Ut;
@@ -1572,14 +1576,12 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
           e
         );
       }; /**
-     * Unfollow the specified target account, honoring configured limits, delays, and pause rules.
+     * Unfollow the specified target account while respecting configured limits, delays, and pause rules.
      *
-     * Finds and clicks the target's unfollow control in the page UI, records progress, shows success
-     * or error notifications, and waits a randomized interval after a successful unfollow or when a
-     * configured pause is required.
+     * Locates and clicks the account's unfollow control in the page UI, records progress, displays success or error notifications, and waits the configured interval after a successful unfollow or when a pause is required.
      *
      * @param {Object|string|number} e - Target account (user object, username, or id) used to locate the unfollow button.
-     * @param {?number} [t] - Optional override value affecting pause/delay behavior for this operation.
+     * @param {?number} [t] - Optional override that modifies pause/delay behavior for this operation.
      */
     async function Xt(e, t) {
       const n = await Nt();
@@ -1625,10 +1627,12 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     Ht.addEventListener('click', async () => {
       (d(), Jt(), await Xt());
     }); /**
-     * Attempt to unlike the given tweet action item, record the result, and apply rate limiting and pacing.
+     * Attempt to unlike a tweet action item, record the attempt, and enforce configured rate limits and pacing.
      *
-     * @param {Object} e - The action item representing a tweet; must expose `focusableEl` used to locate the tweet and its unlike control.
-     * @param {*} [t] - Optional token passed to the failure handler when the unlike cannot be performed.
+     * Retrieves and applies the stored unlike configuration, checks eligibility based on prior mass-like records and configured rules, clicks the tweet's unlike control when eligible, updates UI state on success, and schedules the configured delay after the attempt. If the unlike control cannot be found or the item is ineligible, invokes the failure handler (passing the optional token) and applies a short backoff.
+     *
+     * @param {Object} e - Action item representing the tweet; must expose `focusableEl` used to locate the unlike control.
+     * @param {*} [t] - Optional token forwarded to the failure handler when the unlike cannot be performed.
      */
     async function zt(e, t) {
       const n = await normalizeUnlikeConfig();
@@ -1676,14 +1680,12 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
       (g(), en(), await zt());
     });
     const on = () => findUnretweetConfirmButton(); /**
-     * Performs a mass unretweet operation using current configuration, applying optional overrides.
+     * Execute a mass unretweet run using the current configuration, optionally overriding limits and skip-recording behavior.
      *
-     * Attempts to unretweet items discovered by the internal iterator, updates action counters and status,
-     * and respects configured limits and interval delays. When an item cannot be unretweeted and the
-     * fallback flag is provided, the item is recorded/skipped and the routine continues.
+     * Runs through discovered timeline items and attempts to unretweet eligible tweets until the configured (or overridden) limit is reached, applying configured interval delays between actions. When `recordOnSkip` is truthy, items that are skipped or unavailable are recorded via the module's skip handler.
      *
-     * @param {number} [limit] - Optional maximum number of unretweets to perform for this run (overrides configured limit).
-     * @param {boolean|any} [recordOnSkip] - Optional flag or context used when an item is skipped/unavailable; when truthy the skip is recorded via the module's skip handler.
+     * @param {number} [limit] - Optional override for the maximum number of unretweets to perform this run.
+     * @param {boolean|any} [recordOnSkip] - If truthy, record skipped/unavailable items (value may carry context used by the recorder).
      */
     async function an(e, t) {
       const n = await normalizeUnretweetConfig();
@@ -1929,8 +1931,8 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     function Rn() {
       ((dn.style.display = 'flex'), qt(), pt(), Rt(), Jt());
     } /**
-     * Load Pro activation data from chrome.storage.sync.
-     * @returns {{proActivationKey?: string, proExpiresAt?: number}} Object containing the stored `proActivationKey` and `proExpiresAt` fields when available.
+     * Retrieve stored Pro activation fields from Chrome sync storage.
+     * @returns {{proActivationKey?: string, proExpiresAt?: number}} An object containing `proActivationKey` (string) and `proExpiresAt` (number) when available.
      */
     function Ln() {
       return new Promise((e) => {
@@ -1950,16 +1952,18 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
       dn.append(yn),
       yn.addEventListener('click', () => un()));
     const vn = 50; /**
-     * Set the global `Un` flag to `true` to mark autopilot as active.
+     * Activate the autopilot mode for the content script.
+     *
+     * Sets the internal flag that marks autopilot as running.
      */
     function jn() {
       Un = !0;
     } /**
-     * Reset internal autopilot state for the current page and bootstrap page-specific data.
+     * Reset autopilot runtime state for the current page and reinitialize page-specific data.
      *
-     * Clears transient counters and flags, updates the current page key, awaits retrieval
-     * of page data, updates the cached state accordingly, and invokes follow-up startup
-     * handlers (including the no-cache handler when applicable).
+     * Clears transient counters and flags, refreshes the current page key, loads stored page
+     * configuration/state, updates cached values, and invokes follow-up startup handlers
+     * (including the no-cache handler when applicable).
      */
     async function Bn() {
       ((Tn = 0),
@@ -1976,12 +1980,8 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     const Wn = () => {
       An = En ? Date.now() + En : void 0;
     }; /**
-     * Update the global timing value from the provided seconds value and apply the change.
-     *
-     * Sets the module-level variable `En` to the numeric value of `e` converted from seconds to milliseconds,
-     * then invokes `Wn()` to react to the updated timing.
-     *
-     * @param {string|number} e - A numeric value (or numeric string) expressing time in seconds.
+     * Update the module timing used for paced actions from a seconds value and apply the change.
+     * @param {string|number} e - Time in seconds (number or numeric string); fractional values allowed.
      */
     function On(e) {
       ((En = 1e3 * parseFloat(e)), Wn());
@@ -2000,16 +2000,16 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     function Gn() {
       An && An <= Date.now() && (console.log('Idle timeout'), (An = void 0), (Un = !0));
     } /**
-     * Set the global `qn` value to the number of seconds represented by the given minutes input.
-     * @param {string|number} e - Minutes value (numeric or string) to parse and convert to seconds.
+     * Update the global delay value `qn` to the number of seconds represented by the provided minutes.
+     * @param {string|number} e - Minutes as a number or numeric string; fractional minutes are allowed and will be parsed as a float.
      */
     function Nn(e) {
       qn = 60 * parseFloat(e);
     } /**
-     * Start a one-second countdown that updates the global `Pn` and invokes `gn` on each tick.
+     * Start a one-second countdown that updates the global `Pn` and calls `gn` on each tick.
      *
-     * Initializes `Pn` from `qn`, then decrements `Pn` every second and calls `gn()`. If `Pn` reaches
-     * zero or the global `Un` flag becomes truthy, the interval is cleared and `Pn` is set to `false`.
+     * Initializes `Pn` from `qn`, decrements `Pn` once per second, and invokes `gn()` after each decrement.
+     * The countdown stops when `Pn` reaches zero or the global `Un` flag becomes truthy; when stopped, `Pn` is set to `false`.
      */
     function Xn() {
       Pn = qn;
@@ -2027,28 +2027,27 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     function Hn(e) {
       ((Cn || (Mn && e < Mn)) && (Mn = e), xn());
     } /**
-     * Set the internal Dn handler/value used to control the current action.
-     * @param {*} e - The value or handler to assign to the internal `Dn` variable.
+     * Set the current autopilot action handler or value.
+     *
+     * Assigns the provided handler or value to the internal `Dn` variable that determines the active action.
+     * @param {*} e - The handler or value to use as the current action; pass `null` to clear the current action.
      */
     function Jn(e) {
       Dn = e;
     } /**
-     * Advance the internal action counter and enforce stop/resume conditions for the autopilot loop.
+     * Advance the internal action attempt counter and enforce autopilot stop or continuation rules.
      *
-     * Increments the global attempt counter. If a per-session limit is reached the autopilot is marked
-     * paused and the session-finalization handler is invoked. If a daily (or aggregate) limit is reached
-     * the autopilot is marked paused and the daily-finalization handlers are invoked. If no limits are
-     * met, the routine for continuing normal iteration is called. In all cases, the progress/timing
-     * updater is invoked after the decision.
+     * Increments the internal attempt counter. If a per-session attempt limit is reached, pauses autopilot and invokes the session-finalization handler. If a daily or aggregate limit is reached, pauses autopilot and invokes the daily-finalization handlers. Otherwise continues with the normal iteration routine. Always invokes the progress/timing updater after making the decision.
      */
     function Qn() {
       ((Tn += 1),
         Mn && Mn <= Tn ? ((Un = !0), Fn()) : $n && Tn + In >= $n ? ((Un = !0), i(), hn()) : xn(),
         Wn());
     } /**
-     * Determine whether the current page matches the stored page key or a specific pathname, clearing the `Un` flag when it does not.
+     * Check whether the current page matches the stored page key or the configured pathname.
      *
-     * @returns {boolean} `true` if `spwCurrentPageKey()` equals `_n` or `location.pathname` equals `Dn`, `false` otherwise (clears `Un` when returning `false`).
+     * If the page does not match, clears the `Un` active flag as a side effect.
+     * @returns {boolean} `true` if `spwCurrentPageKey()` equals `_n` or `location.pathname` equals `Dn`, `false` otherwise.
      */
     function Kn() {
       return spwCurrentPageKey() == _n || location.pathname == Dn || ((Un = !1), !1);
@@ -2153,8 +2152,8 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
       autopilotRepeatAfter: 60,
       autopilotRepeatAfterMax: 60,
     }; /**
-     * Get the application's root UI container.
-     * @returns {HTMLElement} The root DOM element for the UI.
+     * Retrieve the UI configuration merged with any stored settings.
+     * @returns {Object} The UI configuration object produced by merging the default UI config with stored config values.
      */
     function ui() {
       return mergeWithStoredConfig(ci);
@@ -2215,18 +2214,16 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
           scheduleRepeat: yi,
         });
       }; /**
-     * Start the content bootstrap sequence and process the initial state.
-     *
-     * Marks the module as started, runs initial startup handlers, obtains the page's initial
-     * state, and processes that state.
-     * @returns {any} The value produced by processing the initial state.
+     * Bootstrap the content script by marking it started, running initial startup handlers, obtaining the page's initial state, and initiating processing of that state.
      */
     async function ki() {
       ((fi = !0), jn());
       const e = await si();
       gi(e);
     } /**
-     * Orchestrates and executes a pending autopilot instruction by loading the next job, preparing runtime state, running precondition checks, dispatching the matching mass-action handler (follow, like, retweet, unfollow, unlike, or unretweet), and performing finalization or aborting when runtime guards trigger.
+     * Execute the next pending autopilot action and manage its lifecycle.
+     *
+     * Loads the next job, initializes runtime state, verifies preconditions, delegates to the appropriate mass-action handler (follow, like, retweet, unfollow, unlike, or unretweet), and advances or aborts the autopilot flow based on runtime guards and completion.
      */
     async function bi() {
       if (((wi = await oi()), wi)) {
