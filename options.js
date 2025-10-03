@@ -22,6 +22,12 @@
         })
         .catch(() => {});
     }
+    /**
+     * Persist a key-value pair to chrome.storage.sync, falling back to chrome.storage.local if sync fails.
+     * @param {string} key - The storage key to set.
+     * @param {*} value - The value to store for the given key.
+     * @returns {Promise<void>} Resolves with no value when the storage operation completes.
+     */
     function e(e, t) {
       return new Promise((n) => {
         const i = {};
@@ -64,6 +70,11 @@
       })();
       return (Array.isArray(e) && (i = e), i);
     }
+    /**
+     * Persist the current in-memory actions array to storage under the autopilot actions key.
+     *
+     * Writes the actions array to chrome storage and waits for the write operation to complete.
+     */
     async function l() {
       await e(n, i);
     }
@@ -155,6 +166,11 @@
     const y = ({ id: e }) => `action_${e}_idle_timeout`;
     const v = ({ id: e }) => `action_${e}_limit`;
     const M = ({ id: e }) => `action_${e}_remove`;
+    /**
+     * Attach the given action's id to its corresponding remove-button element's dataset.
+     *
+     * @param {{id: string|number}} e - Action object with an `id` property used to identify the DOM element.
+     */
     function g(e) {
       const t = getCachedElement(M(e));
       if (t) {
@@ -228,6 +244,21 @@
       h.addEventListener('change', handleActionChange);
       h.addEventListener('click', handleActionClick);
     }
+    /**
+     * Create and insert a table row representing an autopilot action, populate its inputs, and initialize associated UI state.
+     *
+     * This function appends a new action row to the actions table, sets input/select values from the provided action object,
+     * attaches the action id to related elements' dataset, establishes field aliases for persistence, and initializes the row's
+     * visual state and controls so it is ready for user interaction.
+     *
+     * @param {Object} e - Action object to render.
+     * @param {string|number} e.id - Unique identifier for the action.
+     * @param {number} e.number - Sequential display number for the action label.
+     * @param {string} [e.type] - Preselected action type (e.g., "mass_follow").
+     * @param {string} [e.url] - Prepopulated URL for the action.
+     * @param {number} [e.limit] - Prepopulated numeric limit for the action.
+     * @param {number} [e.idleTimeout] - Prepopulated idle timeout value for the action.
+     */
     function A(e) {
       const t = document.createElement("tr");
       (t.classList.add("action"),
