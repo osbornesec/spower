@@ -72,7 +72,7 @@ export const updateActionPanelVisibility = async ({
 
   if (anyVisible) {
     statusBar.hide();
-    panel.element.classList.toggle('sft-panel--search-page', isSearchPath);
+    panel.element.classList.toggle('xf-panel--search-page', isSearchPath);
     showPanel();
   } else {
     hidePanel();

@@ -1,6 +1,6 @@
 # Architecture Overview
 
-Superpowers for Twitter is a Manifest V3 browser extension that orchestrates automation flows across three primary surfaces: the background/page context, the injected content script, and the options UI.
+XFlow is a Manifest V3 browser extension that orchestrates automation flows across three primary surfaces: the background/page context, the injected content script, and the options UI.
 
 ## High-Level Components
 

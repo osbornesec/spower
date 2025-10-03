@@ -19,7 +19,7 @@ describe('README.md Validation', () => {
   describe('Structure and Required Sections', () => {
     it('should have a title header', () => {
       expect(readmeContent).toMatch(/^# /m);
-      expect(readmeContent).toContain('# Superpowers for Twitter (spower)');
+      expect(readmeContent).toContain('# XFlow');
     });
 
     it('should contain all required sections', () => {
@@ -60,7 +60,7 @@ describe('README.md Validation', () => {
 
   describe('Getting Started Instructions', () => {
     it('should provide clone command with correct repository URL', () => {
-      expect(readmeContent).toContain('git clone https://github.com/osbornesec/spower.git');
+      expect(readmeContent).toContain('git clone https://github.com/osbornesec/xflow.git');
     });
 
     it('should include all required npm commands', () => {
@@ -243,7 +243,7 @@ describe('README.md Validation', () => {
     });
 
     it('should reference GitHub repository correctly', () => {
-      expect(readmeContent).toContain('github.com/osbornesec/spower');
+      expect(readmeContent).toContain('github.com/osbornesec/xflow');
     });
 
     it('should link to vitest.dev', () => {

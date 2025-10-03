@@ -272,7 +272,7 @@ describe('app.js XMLHttpRequest instrumentation', () => {
   it('should use fallback instrumentation when Object.defineProperty fails', async () => {
     const originalDefineProperty = Object.defineProperty;
     Object.defineProperty = (obj, prop, desc) => {
-      if (prop === '__spwInstrumentedOpen__' || prop === '__spwInstrumentedSend__') {
+      if (prop === '__xfInstrumentedOpen__' || prop === '__xfInstrumentedSend__') {
         throw new Error('Cannot define property');
       }
       return originalDefineProperty(obj, prop, desc);
@@ -281,8 +281,8 @@ describe('app.js XMLHttpRequest instrumentation', () => {
     vi.resetModules();
     await import('../app.js');
 
-    expect(XMLHttpRequest.prototype.open.__spwInstrumentedOpen__).toBe(true);
-    expect(XMLHttpRequest.prototype.send.__spwInstrumentedSend__).toBe(true);
+    expect(XMLHttpRequest.prototype.open.__xfInstrumentedOpen__).toBe(true);
+    expect(XMLHttpRequest.prototype.send.__xfInstrumentedSend__).toBe(true);
 
     Object.defineProperty = originalDefineProperty;
   });

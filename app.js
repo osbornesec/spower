@@ -34,8 +34,8 @@
     return `${hrefKey}::${normalizedLabel.toUpperCase()}`;
   };
 
-  const OPEN_FLAG = '__spwInstrumentedOpen__';
-  const SEND_FLAG = '__spwInstrumentedSend__';
+  const OPEN_FLAG = '__xfInstrumentedOpen__';
+  const SEND_FLAG = '__xfInstrumentedSend__';
 
   const markInstrumented = (fn, flag) => {
     try {

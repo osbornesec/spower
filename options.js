@@ -2,14 +2,14 @@
   "use strict";
   (() => {
     const perfModuleUrl = chrome.runtime?.getURL?.('utils/perf.js');
-    let spwDebounce = (fn, wait = 150) => {
+    let xfDebounce = (fn, wait = 150) => {
       let timeoutId;
       return (...args) => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => fn(...args), wait);
       };
     };
-    let spwIdleInit = (fn) =>
+    let xfIdleInit = (fn) =>
       ('requestIdleCallback' in globalThis)
         ? requestIdleCallback(fn, { timeout: 100 })
         : setTimeout(fn, 0);
@@ -17,8 +17,8 @@
       import(perfModuleUrl)
         .then((mod) => {
           if (!mod) return;
-          if (mod.spwDebounce) spwDebounce = mod.spwDebounce;
-          if (mod.spwIdleInit) spwIdleInit = mod.spwIdleInit;
+          if (mod.xfDebounce) xfDebounce = mod.xfDebounce;
+          if (mod.xfIdleInit) xfIdleInit = mod.xfIdleInit;
         })
         .catch(() => {});
     }
@@ -130,7 +130,7 @@
         },
       };
     const pendingFieldIds = new Set();
-    const persistQueuedFields = spwDebounce(async () => {
+    const persistQueuedFields = xfDebounce(async () => {
       await l();
       pendingFieldIds.forEach((fieldId) => {
         d.animateSuccess(fieldId);
@@ -142,7 +142,7 @@
       persistQueuedFields();
     };
     const settingUpdates = new Map();
-    const persistSettings = spwDebounce(async () => {
+    const persistSettings = xfDebounce(async () => {
       const entries = Array.from(settingUpdates.entries());
       settingUpdates.clear();
       for (const [fieldId, value] of entries) {
@@ -459,7 +459,7 @@
       d.addAlias("retweetSkipReplies", "retweetSkipRetweets"),
       d.addAlias("unfollowPauseAfterSkipMax", "unfollowPauseAfterSkipMin"),
       d.addAlias("followPauseAfterSkipMax", "followPauseAfterSkipMin"));
-    const spwBootOptions = async () => {
+    const xfBootOptions = async () => {
       H();
       let e = await B();
       ((e = { ...e, ...(await W()) }),
@@ -489,9 +489,9 @@
         await S());
     };
 
-    if (typeof window !== 'undefined' && typeof window.__SPW_TEST_HARNESS__ === 'function') {
-      window.__SPW_TEST_HARNESS__({
-        boot: spwBootOptions,
+    if (typeof window !== 'undefined' && typeof window.__XF_TEST_HARNESS__ === 'function') {
+      window.__XF_TEST_HARNESS__({
+        boot: xfBootOptions,
         handleActionInput,
         handleActionChange,
         handleActionClick,
@@ -502,8 +502,8 @@
         actions: i,
       });
     } else {
-      spwIdleInit(() => {
-        spwBootOptions();
+      xfIdleInit(() => {
+        xfBootOptions();
       });
     }
   })();

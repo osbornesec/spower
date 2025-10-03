@@ -67,62 +67,62 @@ import {
 } from '../shared/autopilot/scheduler.js';
 
 /**
- * @fileoverview Content script entry for Superpowers; handles autopilot
+ * @fileoverview Content script entry for XFlow; handles autopilot
  * actions, timeline parsing, and UI prompts on x.com pages.
  */
 (() => {
   'use strict';
-  const SPW_INITIAL_DEV = (() => {
+  const XF_INITIAL_DEV = (() => {
     try {
-      return globalThis.localStorage?.getItem('spw_dev') === '1';
+      return globalThis.localStorage?.getItem('xf_dev') === '1';
     } catch {
       return false;
     }
   })();
-  let spwMark = (label) => {
-    if (SPW_INITIAL_DEV && globalThis.performance) {
+  let xfMark = (label) => {
+    if (XF_INITIAL_DEV && globalThis.performance) {
       performance.mark(label);
     }
   };
-  let spwMeasure = (name, start, end) => {
-    if (!SPW_INITIAL_DEV || !globalThis.performance) return;
+  let xfMeasure = (name, start, end) => {
+    if (!XF_INITIAL_DEV || !globalThis.performance) return;
     try {
       performance.measure(name, start, end);
       const entry = performance.getEntriesByName(name).pop();
       if (entry) {
-        console.log(`[SPW_PERF] ${name}: ${entry.duration.toFixed(1)}ms`);
+        console.log(`[XF_PERF] ${name}: ${entry.duration.toFixed(1)}ms`);
       }
     } catch {}
   };
-  let spwDebounce = (fn, wait = 150) => {
+  let xfDebounce = (fn, wait = 150) => {
     let timeoutId;
     return (...args) => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => fn(...args), wait);
     };
   };
-  let spwIdleInit = (fn) =>
+  let xfIdleInit = (fn) =>
     'requestIdleCallback' in globalThis
       ? requestIdleCallback(fn, { timeout: 100 })
       : setTimeout(fn, 0);
-  const spwPerfModuleURL = chrome.runtime?.getURL?.('utils/perf.js');
-  if (spwPerfModuleURL) {
-    import(spwPerfModuleURL)
+  const xfPerfModuleURL = chrome.runtime?.getURL?.('utils/perf.js');
+  if (xfPerfModuleURL) {
+    import(xfPerfModuleURL)
       .then((mod) => {
         if (!mod) return;
-        if (mod.spwMark) spwMark = mod.spwMark;
-        if (mod.spwMeasure) spwMeasure = mod.spwMeasure;
-        if (mod.spwDebounce) spwDebounce = mod.spwDebounce;
-        if (mod.spwIdleInit) spwIdleInit = mod.spwIdleInit;
+        if (mod.xfMark) xfMark = mod.xfMark;
+        if (mod.xfMeasure) xfMeasure = mod.xfMeasure;
+        if (mod.xfDebounce) xfDebounce = mod.xfDebounce;
+        if (mod.xfIdleInit) xfIdleInit = mod.xfIdleInit;
       })
       .catch(() => {});
   }
-  spwMark('SPW_PERF_START');
-  const spwFinalize = () => {
-    spwMark('SPW_PERF_END');
-    spwMeasure('SPW_PERF_CONTENT_INIT', 'SPW_PERF_START', 'SPW_PERF_END');
+  xfMark('XF_PERF_START');
+  const xfFinalize = () => {
+    xfMark('XF_PERF_END');
+    xfMeasure('XF_PERF_CONTENT_INIT', 'XF_PERF_START', 'XF_PERF_END');
   };
-  spwIdleInit(spwFinalize);
+  xfIdleInit(xfFinalize);
   (() => {
     /**
      * Pause for the given number of milliseconds.
@@ -141,7 +141,7 @@ import {
     }
     const o = [],
       l = ({ text: e, title: t, action: n }) =>
-        `\n    <div class="sft-ad animated fadeInRight">\n      <div class="sft-ad__title">${t}</div>\n      <div class="sft-ad__text">${e}</div>\n      <a class="sft-ad__action" href="${n.url}" target="_blank">${n.text}</a>\n    </div>\n  `,
+        `\n    <div class="xf-ad animated fadeInRight">\n      <div class="xf-ad__title">${t}</div>\n      <div class="xf-ad__text">${e}</div>\n      <a class="xf-ad__action" href="${n.url}" target="_blank">${n.text}</a>\n    </div>\n  `,
       a = document.createElement('div'); /**
      * Hides the DOM element referenced by the global variable `a`.
      *
@@ -157,9 +157,9 @@ import {
     function r() {
       ((a.innerHTML = ''), (a.style.display = 'none'));
     }
-    const spwBody = document.body;
-    /* SPW_OPTIMIZED_QUERY */ (a.classList.add('sft-ads'),
-      spwIdleInit(() => spwBody.appendChild(a)));
+    const xfBody = document.body;
+    /* XF_OPTIMIZED_QUERY */ (a.classList.add('xf-ads'),
+      xfIdleInit(() => xfBody.appendChild(a)));
     const u = document.createElement('div');
     let w; /**
      * Set the global action mode to "follow".
@@ -217,26 +217,26 @@ import {
      * Throws when the key is absent to surface developer errors early.
      */
     const F = requireKey;
-    const spwResolveRestId = resolveRestId;
-    const SPW_TABLIST_ROLE = 'tablist';
-    const spwNormalizeKey = (e) => ('string' == typeof e ? e.toUpperCase() : e);
-    const spwResolveHomeTab = () => {
+    const xfResolveRestId = resolveRestId;
+    const XF_TABLIST_ROLE = 'tablist';
+    const xfNormalizeKey = (e) => ('string' == typeof e ? e.toUpperCase() : e);
+    const xfResolveHomeTab = () => {
       const focused = document.activeElement;
       if (
         focused &&
         focused.getAttribute('role') === 'tab' &&
-        focused.parentElement?.getAttribute('role') === SPW_TABLIST_ROLE
+        focused.parentElement?.getAttribute('role') === XF_TABLIST_ROLE
       ) {
         return focused;
       }
       return findSelectedHomeTab();
     };
-    const spwCurrentPageKey = () => {
-      const hrefKey = spwNormalizeKey(location.href);
+    const xfCurrentPageKey = () => {
+      const hrefKey = xfNormalizeKey(location.href);
       if (location.pathname !== '/home') {
         return hrefKey;
       }
-      const tabEl = spwResolveHomeTab();
+      const tabEl = xfResolveHomeTab();
       if (!tabEl) {
         return hrefKey;
       }
@@ -245,10 +245,10 @@ import {
         return hrefKey;
       }
       const normalizedLabel = rawLabel.replace(/\s+/g, ' ');
-      return `${hrefKey}::${spwNormalizeKey(normalizedLabel)}`;
+      return `${hrefKey}::${xfNormalizeKey(normalizedLabel)}`;
     };
-    u.classList.add('sft-status-bar__label');
-    const spwInitialStatePattern = /window.__INITIAL_STATE__=({[\s\S]*?});window.__META_DATA__/;
+    u.classList.add('xf-status-bar__label');
+    const xfInitialStatePattern = /window.__INITIAL_STATE__=({[\s\S]*?});window.__META_DATA__/;
     let h =
       globalThis.__INITIAL_STATE__ && 'object' == typeof globalThis.__INITIAL_STATE__
         ? globalThis.__INITIAL_STATE__
@@ -257,19 +257,19 @@ import {
       for (const e of document.querySelectorAll('script')) {
         const t = e.textContent || '';
         if (!t.includes('__INITIAL_STATE__')) continue;
-        const n = t.match(spwInitialStatePattern);
+        const n = t.match(xfInitialStatePattern);
         if (n && n[1]) {
           try {
             h = JSON.parse(n[1]);
             break;
           } catch (e) {
-            console.warn('[SPW] failed to parse __INITIAL_STATE__ payload', e);
+            console.warn('[XF] failed to parse __INITIAL_STATE__ payload', e);
           }
         }
       }
     }
     if (!h) {
-      console.warn('[SPW] initial state unavailable; skipping bootstrap');
+      console.warn('[XF] initial state unavailable; skipping bootstrap');
       return;
     }
     const x = h.session,
@@ -410,12 +410,12 @@ import {
      * @returns {string|undefined} The resolved REST id if found, `undefined` otherwise.
      */
     function V(e) {
-      const t = spwResolveRestId(e);
+      const t = xfResolveRestId(e);
       if (t) return t;
       try {
         return F(e, 'rest_id');
       } catch {
-        console.warn('[SPW] rest_id unavailable', e?.__typename ?? typeof e);
+        console.warn('[XF] rest_id unavailable', e?.__typename ?? typeof e);
         return void 0;
       }
     } /**
@@ -449,12 +449,12 @@ import {
       return `/${P(e)}`;
     }
     const J = (e) => {
-      const t = spwResolveRestId(e);
+      const t = xfResolveRestId(e);
       if (t) return t;
       try {
         return F(e, 'rest_id');
       } catch {
-        console.warn('[SPW] rest_id unavailable', e?.__typename ?? typeof e);
+        console.warn('[XF] rest_id unavailable', e?.__typename ?? typeof e);
         return void 0;
       }
     }; /**
@@ -582,7 +582,7 @@ import {
           (fe[e] ? (fe[e] = fe[e].concat(t)) : (fe[e] = t));
       })(e, M(t)),
     );
-    const de = () => fe[spwCurrentPageKey()];
+    const de = () => fe[xfCurrentPageKey()];
     let Tn,
       _n,
       $n,
@@ -668,7 +668,7 @@ import {
       ue('/ListSubscribers', ({ origin: e, parsedResponse: t }) => Fe(e, he(e, t))),
       ue('/Retweeters', ({ origin: e, parsedResponse: t }) => Fe(e, he(e, t))),
       ue('i/api/graphql', ({ origin: e, parsedResponse: t }) => Fe(e, he(e, t))));
-    const xe = () => be[spwCurrentPageKey()]; /**
+    const xe = () => be[xfCurrentPageKey()]; /**
      * Invoke a callback for each item in the current focus/list processing context.
      * @param {Function} e - Callback invoked for each processed item; receives the current list item or its focusable element.
      * @param {Function} [t=resolveProfileLink] - Resolver that maps a list item to a focusable element; defaults to `resolveProfileLink`.
@@ -690,7 +690,7 @@ import {
       ue('/CommunityTweetsTimeline', ({ origin: e, parsedResponse: t }) => Se(e, M(t))),
       ue('/TopicLandingPage', ({ origin: e, parsedResponse: t }) => Se(e, M(t))),
       ue('i/api/graphql', ({ origin: e, parsedResponse: t }) => Se(e, M(t))));
-    const ve = () => Le[spwCurrentPageKey()]; /**
+    const ve = () => Le[xfCurrentPageKey()]; /**
      * Execute a callback via the action executor, supplying the page focusable-element resolver and list provider.
      * @param {Function} e - Callback to invoke within the executor; its return value is not propagated by this wrapper.
      */
@@ -709,7 +709,7 @@ import {
         });
       })(e, M(t)),
     );
-    const $e = () => _e[spwCurrentPageKey()]; /**
+    const $e = () => _e[xfCurrentPageKey()]; /**
      * Iterate over the page's focusable items and invoke the given callback for each one.
      *
      * @param {Function} e - Callback invoked for each focusable item; receives the item element and any item-specific context provided by the runner.
@@ -729,7 +729,7 @@ import {
         });
       })(e, M(t)),
     );
-    const Ee = () => Ie[spwCurrentPageKey()]; /**
+    const Ee = () => Ie[xfCurrentPageKey()]; /**
      * Invoke a callback for each focusable tweet element using the module's list and focus helpers.
      * @param {Function} e - Callback invoked for each focusable element retrieved from the module list.
      */
@@ -739,7 +739,7 @@ import {
     const Ce = document.createElement('div');
     ((Ce.innerText = 'Autopilot'),
       Ce.setAttribute('role', 'button'),
-      Ce.classList.add('sft-button', 'sft-button--autopilot'));
+      Ce.classList.add('xf-button', 'xf-button--autopilot'));
     const De = () => {
       Ce.style.display = 'none';
     }; /**
@@ -761,7 +761,7 @@ import {
     Ce.addEventListener('click', () => {
       (De(), mi());
     });
-    const Ue = window.indexedDB.open('MassFollowForTwitter', 8);
+    const Ue = window.indexedDB.open('XFlow', 8);
     let Pe; /**
      * Add a record to the specified IndexedDB object store.
      * @param {string} storeName - The name of the object store to write to.
@@ -855,7 +855,7 @@ import {
       },
       Ke = (e, t) => {
         const n = document.createElement('div');
-        (n.classList.add('sft-notification', `sft-notification--${t}`), (n.textContent = e));
+        (n.classList.add('xf-notification', `xf-notification--${t}`), (n.textContent = e));
         try {
           Je.appendChild(n);
         } catch (e) {
@@ -1056,7 +1056,7 @@ import {
     const mt = document.createElement('div');
     ((mt.innerText = 'Like all'),
       mt.setAttribute('role', 'button'),
-      mt.classList.add('sft-button', 'sft-button--like'));
+      mt.classList.add('xf-button', 'xf-button--like'));
     const pt = () => {
       mt.style.display = 'none';
     };
@@ -1133,7 +1133,7 @@ import {
     const xt = document.createElement('div');
     ((xt.innerText = 'Retweet all'),
       xt.setAttribute('role', 'button'),
-      xt.classList.add('sft-button', 'sft-button--retweet'));
+      xt.classList.add('xf-button', 'xf-button--retweet'));
     const Rt = () => {
       xt.style.display = 'none';
     }; /**
@@ -1455,7 +1455,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     const Dt = document.createElement('div');
     ((Dt.innerText = 'Follow all'),
       Dt.setAttribute('role', 'button'),
-      Dt.classList.add('sft-button', 'sft-button--follow'));
+      Dt.classList.add('xf-button', 'xf-button--follow'));
     const qt = () => {
       Dt.style.display = 'none';
     };
@@ -1608,7 +1608,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     const Ht = document.createElement('div');
     ((Ht.innerText = 'Unfollow all'),
       Ht.setAttribute('role', 'button'),
-      Ht.classList.add('sft-button', 'sft-button--unfollow'));
+      Ht.classList.add('xf-button', 'xf-button--unfollow'));
     const Jt = () => {
       Ht.style.display = 'none';
     }; /**
@@ -1661,7 +1661,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     const Zt = document.createElement('div');
     ((Zt.innerText = 'Unlike all'),
       Zt.setAttribute('role', 'button'),
-      Zt.classList.add('sft-button', 'sft-button--unlike'));
+      Zt.classList.add('xf-button', 'xf-button--unlike'));
     const en = () => {
       Zt.style.display = 'none';
     }; /**
@@ -1720,7 +1720,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     const sn = document.createElement('div');
     ((sn.innerText = 'Unretweet all'),
       sn.setAttribute('role', 'button'),
-      sn.classList.add('sft-button', 'sft-button--unretweet'));
+      sn.classList.add('xf-button', 'xf-button--unretweet'));
     const rn = () => {
       sn.style.display = 'none';
     };
@@ -1729,7 +1729,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     });
     const cn = document.createElement('aside');
     (cn.setAttribute('role', 'complementary'),
-      cn.classList.add('sft-panel'),
+      cn.classList.add('xf-panel'),
       document.body.appendChild(cn));
     const un = () => {
         cn.style.display = 'none';
@@ -1802,11 +1802,11 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
       });
     };
     const dn = document.createElement('div');
-    dn.classList.add('sft-status-bar');
+    dn.classList.add('xf-status-bar');
     const mn = document.createElement('div');
     ((mn.innerText = 'Skip'),
       mn.setAttribute('role', 'button'),
-      mn.classList.add('sft-status-bar__button'),
+      mn.classList.add('xf-status-bar__button'),
       dn.append(mn),
       mn.addEventListener('click', async () => {
         ((mn.style.display = 'none'), await ki());
@@ -1814,7 +1814,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     const pn = document.createElement('div');
     ((pn.innerText = 'Cancel'),
       pn.setAttribute('role', 'button'),
-      pn.classList.add('sft-status-bar__button'),
+      pn.classList.add('xf-status-bar__button'),
       dn.append(pn),
       pn.addEventListener('click', () => {
         (jn(), pi(), un(), s());
@@ -1948,7 +1948,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     }
     ((yn.innerText = 'Close'),
       yn.setAttribute('role', 'button'),
-      yn.classList.add('sft-status-bar__button'),
+      yn.classList.add('xf-status-bar__button'),
       dn.append(yn),
       yn.addEventListener('click', () => un()));
     const vn = 50; /**
@@ -1970,7 +1970,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
         (In = void 0),
         ($n = void 0),
         (Pn = !1),
-        (_n = spwCurrentPageKey()),
+        (_n = xfCurrentPageKey()),
         (En = void 0),
         (An = void 0),
         (Dn = void 0));
@@ -2047,16 +2047,16 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
      * Check whether the current page matches the stored page key or the configured pathname.
      *
      * If the page does not match, clears the `Un` active flag as a side effect.
-     * @returns {boolean} `true` if `spwCurrentPageKey()` equals `_n` or `location.pathname` equals `Dn`, `false` otherwise.
+     * @returns {boolean} `true` if `xfCurrentPageKey()` equals `_n` or `location.pathname` equals `Dn`, `false` otherwise.
      */
     function Kn() {
-      return spwCurrentPageKey() == _n || location.pathname == Dn || ((Un = !1), !1);
+      return xfCurrentPageKey() == _n || location.pathname == Dn || ((Un = !1), !1);
     } /**
      * Check whether the current page key matches the predefined page key `_n`.
      * @returns {boolean} `true` if the current page key equals `_n`, `false` otherwise.
      */
     function Yn() {
-      return spwCurrentPageKey() == _n;
+      return xfCurrentPageKey() == _n;
     }
     const zn = 'autopilotActions';
     const Zn = (e) => {
@@ -2085,7 +2085,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
      */
     const ti = () => loadFirstAutopilotAction(ei);
     const ni = (e) => `https://www.x.com${e}`;
-    const ii = 'SuperpowersForTwitterAutopilotActionId'; /**
+    const ii = 'XFlowAutopilotActionId'; /**
      * Consume a session-stored identifier and resolve it to the corresponding record.
      *
      * Reads the string value stored at the session key represented by `ii`, removes that entry,
