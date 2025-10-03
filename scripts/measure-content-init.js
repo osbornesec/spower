@@ -19,7 +19,8 @@ const runs = Number.parseInt(runCountArg ?? '5', 10);
 
 const createInitialStateScript = (window) => {
   const script = window.document.createElement('script');
-  script.innerHTML = 'window.__INITIAL_STATE__={"session":{"user_id":"1","user":{"screen_name":"tester","id_str":"1"}},"entities":{"users":{"entities":{"1":{"legacy":{"description":"","followers_count":0,"friends_count":0,"protected":false,"screen_name":"tester"},"core":{"user_id":"1"},"relationship_perspectives":{"followed_by":0},"affiliates_highlight":{"label":{"badge":{"description":""}}}}}}}};window.__META_DATA__={};';
+  script.innerHTML =
+    'window.__INITIAL_STATE__={"session":{"user_id":"1","user":{"screen_name":"tester","id_str":"1"}},"entities":{"users":{"entities":{"1":{"legacy":{"description":"","followers_count":0,"friends_count":0,"protected":false,"screen_name":"tester"},"core":{"user_id":"1"},"relationship_perspectives":{"followed_by":0},"affiliates_highlight":{"label":{"badge":{"description":""}}}}}}}};window.__META_DATA__={};';
   window.document.body.appendChild(script);
   return script;
 };
@@ -37,7 +38,9 @@ const measureOnce = async () => {
   window.performance = performance;
   window.console = console;
   window.localStorage.setItem('spw_dev', '1');
-  window.requestIdleCallback = window.requestIdleCallback || ((fn) => setTimeout(() => fn({ didTimeout: false, timeRemaining: () => 16 }), 1));
+  window.requestIdleCallback =
+    window.requestIdleCallback ||
+    ((fn) => setTimeout(() => fn({ didTimeout: false, timeRemaining: () => 16 }), 1));
   window.cancelIdleCallback = window.cancelIdleCallback || ((id) => clearTimeout(id));
   window.requestAnimationFrame = window.requestAnimationFrame || ((fn) => setTimeout(fn, 16));
   const extensionOrigin = 'chrome-extension://spower-perf-harness';

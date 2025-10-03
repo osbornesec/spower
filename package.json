@@ -4,9 +4,17 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "build": "npm run build:content",
+    "build:content": "node scripts/build-content.js",
+    "build:content:watch": "node scripts/build-content.js --watch",
+    "pretest": "npm run build:content",
+    "pretest:coverage": "npm run build:content",
+    "pretest:watch": "npm run build:content",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "lint": "eslint \"src/**/*.js\" \"scripts/**/*.js\" \"tests/**/*.js\"",
+    "format": "prettier --write \"{src,scripts,tests}/**/*.js\""
   },
   "keywords": [],
   "author": "",
@@ -16,7 +24,12 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.0",
     "@vitest/coverage-v8": "^3.2.4",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.36.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.4.0",
     "jsdom": "^27.0.0",
+    "prettier": "^3.6.2",
     "vitest": "^3.2.4"
   }
 }
