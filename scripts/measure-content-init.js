@@ -37,13 +37,13 @@ const measureOnce = async () => {
 
   window.performance = performance;
   window.console = console;
-  window.localStorage.setItem('spw_dev', '1');
+  window.localStorage.setItem('xf_dev', '1');
   window.requestIdleCallback =
     window.requestIdleCallback ||
     ((fn) => setTimeout(() => fn({ didTimeout: false, timeRemaining: () => 16 }), 1));
   window.cancelIdleCallback = window.cancelIdleCallback || ((id) => clearTimeout(id));
   window.requestAnimationFrame = window.requestAnimationFrame || ((fn) => setTimeout(fn, 16));
-  const extensionOrigin = 'chrome-extension://spower-perf-harness';
+  const extensionOrigin = 'chrome-extension://xflow-perf-harness';
   window.chrome = {
     runtime: {
       getURL: (resourcePath = '') => new URL(resourcePath, `${extensionOrigin}/`).toString(),

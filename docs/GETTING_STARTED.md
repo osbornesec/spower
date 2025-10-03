@@ -9,8 +9,8 @@ This guide walks through installing dependencies, running the extension in a bro
 
 ## 2. Clone the Repository
 ```bash
-git clone https://github.com/osbornesec/spower.git
-cd spower
+git clone https://github.com/osbornesec/xflow.git
+cd xflow
 ```
 
 ## 3. Install Dependencies
@@ -37,8 +37,8 @@ npm run test:coverage
 1. Open `chrome://extensions` (or `edge://extensions` for Edge).
 2. Enable **Developer mode**.
 3. Click **Load unpacked**.
-4. Choose the cloned `spower` directory (the folder containing `manifest.json`).
-5. Verify that "Superpowers for Twitter" appears in the extension list.
+4. Choose the cloned `xflow` directory (the folder containing `manifest.json`).
+5. Verify that "XFlow" appears in the extension list.
 
 ## 6. Open the Options Page
 - From the extension card, click **Details → Extension options** or visit `chrome-extension://<extension-id>/options.html`.
@@ -46,7 +46,7 @@ npm run test:coverage
 
 ## 7. Start Experimenting on X (Twitter)
 - Navigate to `https://x.com/`.
-- Ensure the content script is active by checking DevTools → Console for `Superpowers` log entries.
+- Ensure the content script is active by checking DevTools → Console for `XFlow` log entries.
 - Autopilot controls appear in the UI once configured.
 
 ## 8. Cleaning Up

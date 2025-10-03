@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
-import { spwDebounce } from '../utils/perf.js';
+import { xfDebounce } from '../utils/perf.js';
 
-describe('spwDebounce helper', () => {
+describe('xfDebounce helper', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -10,7 +10,7 @@ describe('spwDebounce helper', () => {
   it('debounces consecutive calls and only invokes the latest arguments', () => {
     vi.useFakeTimers();
     const handler = vi.fn();
-    const debounced = spwDebounce(handler, 100);
+    const debounced = xfDebounce(handler, 100);
 
     debounced('first');
     debounced('second');
@@ -26,7 +26,7 @@ describe('spwDebounce helper', () => {
   it('uses the default wait when none is provided', () => {
     vi.useFakeTimers();
     const handler = vi.fn();
-    const debounced = spwDebounce(handler);
+    const debounced = xfDebounce(handler);
 
     debounced();
     vi.advanceTimersByTime(149);

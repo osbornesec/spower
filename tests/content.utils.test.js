@@ -70,8 +70,8 @@ describe('shared helper behaviour', () => {
 
   describe('requireKey helper', () => {
     it('returns the value when the key exists', () => {
-      const source = { name: 'spw' };
-      expect(requireKey(source, 'name')).toBe('spw');
+      const source = { name: 'xf' };
+      expect(requireKey(source, 'name')).toBe('xf');
     });
 
     it('throws when the property is missing', () => {

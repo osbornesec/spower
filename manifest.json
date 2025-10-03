@@ -23,7 +23,7 @@
    },
    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAovlXLVbVF3I/Z2mKeboqxUxlteH5l5o9Wo629p/CKVlYLZILAVe2T7D6P+LjW/rH4DxoZ7tgCSdVkvG1P7yhHLbvFZ42JrgaXTVaNTXflCxelppWTAqrGb7UIVhjx9PD/C8j23qBTBasc/HDzdXt0VVatNIBo4W1KkuNmnuoT9FjECSLrL8Ww4RpcyFRTWW34Jw4txITIRvB3CjdIzq/qdvGWrQMV0Y7mNXiXePG37RdZERu5vhcRKq+BqGYAZgVHm9L8L9xutBV2vvd1qFHOlKKHb6t7FvNLtHl3kJsp2ICtZsfbCxWNb1QX1Dwa6VGoKrCPXLFPiwXRAEsNP3L4QIDAQAB",
    "manifest_version": 3,
-   "name": "Superpowers for Twitter",
+   "name": "XFlow",
    "options_page": "options.html",
    "permissions": [
       "storage",

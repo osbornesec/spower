@@ -34,8 +34,8 @@ describe('options.js delegated events', () => {
       callback && callback();
     });
 
-    global.__SPW_TEST_HARNESS__ = (exports) => {
-      global.__SPW_TEST_EXPORTS__ = exports;
+    global.__XF_TEST_HARNESS__ = (exports) => {
+      global.__XF_TEST_EXPORTS__ = exports;
     };
   });
 
@@ -44,13 +44,13 @@ describe('options.js delegated events', () => {
     vi.useRealTimers();
     vi.restoreAllMocks();
     document.body.innerHTML = '';
-    delete global.__SPW_TEST_HARNESS__;
-    delete global.__SPW_TEST_EXPORTS__;
+    delete global.__XF_TEST_HARNESS__;
+    delete global.__XF_TEST_EXPORTS__;
   });
 
   const bootstrapOptions = async () => {
     await import('../options.js');
-    const harness = global.__SPW_TEST_EXPORTS__;
+    const harness = global.__XF_TEST_EXPORTS__;
     expect(harness).toBeTruthy();
     await harness.boot();
     vi.runAllTimers();

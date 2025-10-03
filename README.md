@@ -1,4 +1,4 @@
-# Superpowers for Twitter (spower)
+# XFlow
 
 ![License](https://img.shields.io/badge/license-ISC-brightgreen)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518.x-blue)
@@ -46,8 +46,8 @@ vitest.config.js     # Vitest configuration w/ jsdom environment & coverage sett
 ## Get Started Quickly
 1. **Clone & install** (macOS/Linux/Windows via Git Bash or WSL):
    ```bash
-   git clone https://github.com/osbornesec/spower.git
-   cd spower
+   git clone https://github.com/osbornesec/xflow.git
+   cd xflow
    npm install
    ```
 2. **Run tests** (ensures setup works):
@@ -62,8 +62,8 @@ vitest.config.js     # Vitest configuration w/ jsdom environment & coverage sett
 4. **Load in Chrome/Chromium**:
    - Open `chrome://extensions`.
    - Toggle **Developer mode** (top-right).
-   - Click **Load unpacked** and select the repo root (`spower`).
-   - Confirm "Superpowers for Twitter" appears with options page available.
+   - Click **Load unpacked** and select the repo root (`xflow`).
+   - Confirm "XFlow" appears with options page available.
 5. **Optional – Coverage report**:
    ```bash
    npm run test:coverage

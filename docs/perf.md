@@ -2,7 +2,7 @@
 
 ## Methodology
 - Environment: Node.js v24.6.0 with the bundled `scripts/measure-content-init.js` harness.
-- Harness spins up a JSDOM instance of `https://x.com/home`, enables the `spw_dev` flag, and executes the bundled `dist/content.js` five times.
+- Harness spins up a JSDOM instance of `https://x.com/home`, enables the `xf_dev` flag, and executes the bundled `dist/content.js` five times.
 - Each run records `performance.now()` deltas from script injection to completion (including idle callbacks); timers/intervals are cleared after each run.
 - Commands used:
   ```bash
@@ -25,4 +25,4 @@ The optimized startup stays well below the 50 ms target while retaining determin
 
 ## Notes
 - Measurement harness emits benign `XMLHttpRequest` warnings due to stubbed browser APIs; they do not affect the recorded timings.
-- To enable verbose perf logging in-browser set `localStorage.setItem('spw_dev', '1')` before reloading an X page.
+- To enable verbose perf logging in-browser set `localStorage.setItem('xf_dev', '1')` before reloading an X page.

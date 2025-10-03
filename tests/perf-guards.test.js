@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-describe('perf helpers honour SPW_DEV flag', () => {
+describe('perf helpers honour XF_DEV flag', () => {
   beforeEach(() => {
     vi.resetModules();
     localStorage.clear();
@@ -11,48 +11,48 @@ describe('perf helpers honour SPW_DEV flag', () => {
     vi.restoreAllMocks();
   });
 
-  it('does nothing when spw_dev flag is absent', async () => {
+  it('does nothing when xf_dev flag is absent', async () => {
     const markSpy = vi.spyOn(performance, 'mark');
     const measureSpy = vi.spyOn(performance, 'measure');
 
-    const { spwMark, spwMeasure } = await import('../utils/perf.js');
+    const { xfMark, xfMeasure } = await import('../utils/perf.js');
 
-    spwMark('test-start');
-    spwMeasure('test', 'test-start', 'test-end');
+    xfMark('test-start');
+    xfMeasure('test', 'test-start', 'test-end');
 
     expect(markSpy).not.toHaveBeenCalled();
     expect(measureSpy).not.toHaveBeenCalled();
   });
 
-  it('emits marks and measures when spw_dev=1', async () => {
-    localStorage.setItem('spw_dev', '1');
+  it('emits marks and measures when xf_dev=1', async () => {
+    localStorage.setItem('xf_dev', '1');
     const markSpy = vi.spyOn(performance, 'mark');
     const measureSpy = vi.spyOn(performance, 'measure');
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     vi.resetModules();
-    const { spwMark, spwMeasure } = await import('../utils/perf.js');
+    const { xfMark, xfMeasure } = await import('../utils/perf.js');
 
-    spwMark('perm-start');
-    spwMark('perm-end');
-    spwMeasure('range', 'perm-start', 'perm-end');
+    xfMark('perm-start');
+    xfMark('perm-end');
+    xfMeasure('range', 'perm-start', 'perm-end');
 
     expect(markSpy).toHaveBeenCalledTimes(2);
     expect(measureSpy).toHaveBeenCalled();
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('[SPW_PERF] range'));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('[XF_PERF] range'));
   });
 
-  it('handles errors in spwMeasure', async () => {
-    localStorage.setItem('spw_dev', '1');
+  it('handles errors in xfMeasure', async () => {
+    localStorage.setItem('xf_dev', '1');
     const measureSpy = vi.spyOn(performance, 'measure').mockImplementation(() => {
       throw new Error('test error');
     });
 
     vi.resetModules();
-    const { spwMeasure } = await import('../utils/perf.js');
+    const { xfMeasure } = await import('../utils/perf.js');
 
     // This should not throw an error.
-    spwMeasure('test', 'start', 'end');
+    xfMeasure('test', 'start', 'end');
 
     expect(measureSpy).toHaveBeenCalled();
   });

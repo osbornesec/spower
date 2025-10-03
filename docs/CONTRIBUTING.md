@@ -1,6 +1,6 @@
 # Contributing Guide
 
-Thank you for helping improve Superpowers for Twitter. This document outlines the expectations for contributors and reviewers.
+Thank you for helping improve XFlow. This document outlines the expectations for contributors and reviewers.
 
 ## Development Workflow
 1. **Fork & clone** the repository.

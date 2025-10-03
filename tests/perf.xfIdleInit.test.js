@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import { spwIdleInit } from '../utils/perf.js';
+import { xfIdleInit } from '../utils/perf.js';
 
-describe('spwIdleInit', () => {
+describe('xfIdleInit', () => {
   let originalRequestIdleCallback;
 
   beforeEach(() => {
@@ -23,7 +23,7 @@ describe('spwIdleInit', () => {
     const fn = vi.fn();
     globalThis.requestIdleCallback = vi.fn((cb) => cb());
 
-    spwIdleInit(fn);
+    xfIdleInit(fn);
 
     expect(globalThis.requestIdleCallback).toHaveBeenCalled();
     expect(fn).toHaveBeenCalled();
@@ -35,7 +35,7 @@ describe('spwIdleInit', () => {
     const fn = vi.fn();
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
 
-    spwIdleInit(fn);
+    xfIdleInit(fn);
 
     expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 0);
 

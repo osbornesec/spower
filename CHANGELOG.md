@@ -15,4 +15,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-02-14
 ### Added
 - Vitest harness and unit tests covering XMLHttpRequest instrumentation and content helpers.
-- Repository bootstrap for the unpacked Superpowers for Twitter extension.
+- Repository bootstrap for the unpacked XFlow extension.
