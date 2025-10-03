@@ -16,11 +16,11 @@ export const formatDuration = (seconds) => {
 };
 
 export const formatDurationWithMillis = (milliseconds) => {
-  const remainingMillis = milliseconds % 1_000;
-  let formatted = formatDuration((milliseconds - remainingMillis) / 1_000);
-  formatted += '.';
-  formatted += String(remainingMillis).padStart(3, '0');
-  return formatted;
+  const safeMillis = Math.max(0, Math.round(milliseconds));
+  const remainingMillis = safeMillis % 1_000;
+  const secondsPortion = (safeMillis - remainingMillis) / 1_000;
+  return `${formatDuration(secondsPortion)}.${String(remainingMillis).padStart(3, '0')}`;
+};
 };
 
 const ONE_DAY_MILLIS = 24 * 60 * 60 * 1_000;
