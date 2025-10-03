@@ -31,7 +31,9 @@ export const normalizeLikeConfig = async () => {
   config.languageWhitelist = parseCsvList(config.likeLanguageWhitelist);
   config.intervalDurationRange = buildIntervalRange(config.likeIntervalMin, config.likeIntervalMax);
   config.skipLikedXTweetsFromUser = Number.parseInt(config.likeSkipLikedXTweetsFromUser, 10);
-  config.tweetTextBlacklist = compileCsvRegex(config.likeTweetTextBlacklist);
+  const blacklistCsv =
+    typeof config.likeTweetTextBlacklist === 'string' ? config.likeTweetTextBlacklist : '';
+  config.tweetTextBlacklist = compileCsvRegex(blacklistCsv);
   config.maxFollowing = Number.parseInt(config.likeMaxFollowing, 10);
   config.minFollowing = Number.parseInt(config.likeMinFollowing, 10);
   config.maxFollowers = Number.parseInt(config.likeMaxFollowers, 10);

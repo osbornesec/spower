@@ -19,7 +19,7 @@ export const buildIntervalRange = (minSeconds, maxSeconds) => {
 };
 
 export const compileCsvRegex = (value) => {
-  if (value.length === 0) return undefined;
+  if (typeof value !== 'string' || value.length === 0) return undefined;
   const tokens = value
     .split(',')
     .map((entry) => entry.trim())

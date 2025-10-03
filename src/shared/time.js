@@ -1,25 +1,18 @@
 export const formatDuration = (seconds) => {
-  if (seconds < 60) return String(seconds);
+  const roundedSeconds = Math.round(seconds);
+  if (roundedSeconds < 60) return String(roundedSeconds);
 
-  const hoursFloat = seconds / 60 / 60;
-  const wholeHours = Math.floor(hoursFloat);
-  const minutesFloat = 60 * (hoursFloat - wholeHours);
-  const wholeMinutes = Math.floor(minutesFloat);
-  const secondsFloat = 60 * (minutesFloat - wholeMinutes);
-  const wholeSeconds = Math.round(secondsFloat);
+  const totalMinutes = Math.floor(roundedSeconds / 60);
+  const wholeSeconds = roundedSeconds % 60;
+  const wholeHours = Math.floor(totalMinutes / 60);
+  const wholeMinutes = totalMinutes % 60;
 
-  let result;
-  if (wholeHours > 0) {
-    result = String(wholeHours);
-    result += ':';
-    result += String(wholeMinutes).padStart(2, '0');
-  } else {
-    result = String(wholeMinutes);
-  }
+  const prefix =
+    wholeHours > 0
+      ? `${wholeHours}:${String(wholeMinutes).padStart(2, '0')}`
+      : String(wholeMinutes);
 
-  result += ':';
-  result += String(wholeSeconds).padStart(2, '0');
-  return result;
+  return `${prefix}:${String(wholeSeconds).padStart(2, '0')}`;
 };
 
 export const formatDurationWithMillis = (milliseconds) => {

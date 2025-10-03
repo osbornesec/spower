@@ -16,5 +16,9 @@ export const requireKey = (value, key) => {
   if (Object.prototype.hasOwnProperty.call(value, key)) {
     return value[key];
   }
-  throw new Error(`${key} missing on ${JSON.stringify(value)}`);
+  const description =
+    typeof value === 'object' && value !== null
+      ? `[object ${value.constructor?.name || 'Object'}]`
+      : String(value);
+  throw new Error(`${key} missing on ${description}`);
 };

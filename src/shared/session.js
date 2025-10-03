@@ -16,7 +16,9 @@ export const getSuspendedAutopilotActions = (storage = globalThis.sessionStorage
 export const appendSuspendedAutopilotAction = (actionType, storage = globalThis.sessionStorage) => {
   const current = getSuspendedAutopilotActions(storage);
   const next = current.concat(actionType);
-  storage.setItem(SUSPENDED_KEY, JSON.stringify(next));
+  try {
+    storage.setItem(SUSPENDED_KEY, JSON.stringify(next));
+  } catch {}
 };
 
 export const SUSPENDED_AUTOPILOT_KEY = SUSPENDED_KEY;

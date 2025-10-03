@@ -15,21 +15,18 @@ export const findSelectedHomeTab = () =>
 export const findTweetStatusLink = (statusId) => {
   if (!statusId) return null;
   const selector = `[data-testid="tweet"] a[href$="/status/${statusId}"][role="link"]`;
-  console.log(`Querying tweet link with ${selector}`);
   return document.querySelector(selector);
 };
 
 export const findUserFollowButton = (restId, label = restId) => {
   if (!restId) return null;
   const selector = `[data-testid="${restId}-follow"]`;
-  console.log(`Querying follow button of ${label} with ${selector}`);
   return document.querySelector(selector);
 };
 
 export const findUserUnfollowButton = (restId, label = restId) => {
   if (!restId) return null;
   const selector = `[data-testid="${restId}-unfollow"]`;
-  console.log(`Querying unfollow button of ${label} with ${selector}`);
   return document.querySelector(selector);
 };
 
@@ -37,14 +34,12 @@ export const findUserProfileLink = (profilePath, label = profilePath) => {
   if (!profilePath) return null;
   const primarySelector = `[data-testid="cellInnerDiv"] a[href="${profilePath}"][role="link"]`;
   const fallbackSelector = `[data-testid="UserCell"] a[href="${profilePath}"][role="link"]`;
-  console.log(`Querying profile link of ${label} with ${primarySelector}`);
   return document.querySelector(primarySelector) || document.querySelector(fallbackSelector);
 };
 
 export const findModalUserProfileLink = (profilePath, label = profilePath) => {
   if (!profilePath) return null;
   const selector = `[aria-modal="true"] [data-testid="UserCell"] a[href="${profilePath}"][role="link"]:not([dir])`;
-  console.log(`Querying profile link of ${label} with ${selector}`);
   return document.querySelector(selector);
 };
 

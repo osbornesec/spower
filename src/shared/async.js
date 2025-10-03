@@ -1,24 +1,39 @@
 export const sleep = (milliseconds) =>
   new Promise((resolve) => {
-    console.log(`Sleeping ${milliseconds} ms ...`);
     setTimeout(resolve, milliseconds);
   });
 
 export const poll = (resolver, timeout, onSuccess, onTimeout) => {
-  const result = resolver();
-  if (result) {
-    onSuccess(result);
+  if (typeof timeout !== 'number' || timeout <= 0) {
+    throw new Error('timeout must be a positive number');
+  }
+
+  const attempt = () => {
+    const result = resolver();
+    if (result) {
+      onSuccess?.(result);
+      return true;
+    }
+    return false;
+  };
+
+  if (attempt()) {
     return;
   }
 
-  if (typeof timeout === 'number') {
-    if (timeout <= 0) {
-      onTimeout('time limit exceeded');
+  let remaining = timeout - 100;
+  const intervalId = setInterval(() => {
+    if (attempt()) {
+      clearInterval(intervalId);
       return;
     }
-    setTimeout(() => poll(resolver, timeout - 100, onSuccess, onTimeout), 100);
-    return;
-  }
 
-  setTimeout(() => poll(resolver, timeout, onSuccess, onTimeout), 100);
+    if (remaining <= 0) {
+      clearInterval(intervalId);
+      onTimeout?.('time limit exceeded');
+      return;
+    }
+
+    remaining -= 100;
+  }, 100);
 };

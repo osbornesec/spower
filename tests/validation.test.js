@@ -6,6 +6,7 @@ import {
 } from '../src/shared/validation.js';
 
 const NOW = Date.UTC(2024, 0, 31);
+const daysAgo = (days, from = NOW) => from - days * 24 * 60 * 60 * 1_000;
 
 describe('evaluateUnlikeEligibility', () => {
   it('returns undefined when tweet is not liked', () => {
@@ -27,7 +28,7 @@ describe('evaluateUnlikeEligibility', () => {
   });
 
   it('enforces minimum days since like', () => {
-    const threeDaysAgo = NOW - 3 * 24 * 60 * 60 * 1_000;
+    const threeDaysAgo = daysAgo(3);
     const result = evaluateUnlikeEligibility(
       { isLiked: true, massLikeRecordCreatedAt: threeDaysAgo },
       { minDaysSinceLike: 5 },
@@ -38,7 +39,7 @@ describe('evaluateUnlikeEligibility', () => {
 
   it('returns true when all conditions pass', () => {
     const result = evaluateUnlikeEligibility(
-      { isLiked: true, massLikeRecordCreatedAt: NOW - 10 * 24 * 60 * 60 * 1_000 },
+      { isLiked: true, massLikeRecordCreatedAt: daysAgo(10) },
       { unlikeMassLikedRequired: true, minDaysSinceLike: 5 },
       NOW,
     );
@@ -69,7 +70,7 @@ describe('evaluateUnretweetEligibility', () => {
     const result = evaluateUnretweetEligibility(
       {
         isRetweeted: true,
-        retweetCreatedAt: NOW - 2 * 24 * 60 * 60 * 1_000,
+        retweetCreatedAt: daysAgo(2),
         hasMassRetweetRecord: true,
       },
       { minDaysSinceRetweet: 5 },
@@ -82,7 +83,7 @@ describe('evaluateUnretweetEligibility', () => {
     const result = evaluateUnretweetEligibility(
       {
         isRetweeted: true,
-        retweetCreatedAt: NOW - 7 * 24 * 60 * 60 * 1_000,
+        retweetCreatedAt: daysAgo(7),
         hasMassRetweetRecord: true,
       },
       { minDaysSinceRetweet: 5 },

@@ -45,6 +45,9 @@ export const beginAutopilotAction = async ({
   clearSuspendedActions();
   const action = await loadNextAction();
   setPaused(false);
+  if (!action) {
+    return { action: undefined, batchSize: 0 };
+  }
   onActionLoaded?.(action);
 
   const batchSize = await computeBatchSize();
@@ -61,8 +64,9 @@ export const pickRandomDelaySeconds = (minMinutes, maxMinutes, selectValue) => {
   const max = Number.parseFloat(maxMinutes);
   if (!Number.isFinite(min) || !Number.isFinite(max)) return 0;
 
-  let seconds = 60 * min;
-  const target = 60 * max;
+  const [lo, hi] = min <= max ? [min, max] : [max, min];
+  let seconds = 60 * lo;
+  const target = 60 * hi;
   const candidates = [seconds];
   while (seconds < target) {
     seconds += 60;
