@@ -76,7 +76,7 @@
             window.postMessage(payload, window.location.origin);
           } catch (error) {
             if (error && error.name === 'DataCloneError') {
-              delete payload.body;
+              payload.body = null;
               window.postMessage(payload, window.location.origin);
               return;
             }
