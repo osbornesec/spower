@@ -11,7 +11,7 @@ const extractFormatDuration = () => {
 };
 
 const extractDeepGet = () => {
-  const match = contentCode.match(/function b\(e,...t\)({[\s\S]*?})function F/);
+  const match = contentCode.match(/function b\(e,...t\)({[\s\S]*?})/);
   if (!match) throw new Error('Unable to locate deep getter implementation');
   return eval(`(function(e,...t)${match[1]})`);
 };

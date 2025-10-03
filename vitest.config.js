@@ -10,7 +10,7 @@ export default defineConfig({
       provider: 'v8',
       reportsDirectory: './coverage',
       reporter: ['text', 'html'],
-      exclude: ['content.js', 'options.js', 'tests/**', 'vitest.config.js'],
+      exclude: ['content.js', 'options.js', 'scripts/**', 'tests/**', 'vitest.config.js'],
       thresholds: {
         lines: 80,
         statements: 80,

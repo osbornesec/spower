@@ -1,6 +1,33 @@
 (() => {
   "use strict";
   (() => {
+    const perfModuleUrl = chrome.runtime?.getURL?.('utils/perf.js');
+    let spwDebounce = (fn, wait = 150) => {
+      let timeoutId;
+      return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn(...args), wait);
+      };
+    };
+    let spwIdleInit = (fn) =>
+      ('requestIdleCallback' in globalThis)
+        ? requestIdleCallback(fn, { timeout: 100 })
+        : setTimeout(fn, 0);
+    if (perfModuleUrl) {
+      import(perfModuleUrl)
+        .then((mod) => {
+          if (!mod) return;
+          if (mod.spwDebounce) spwDebounce = mod.spwDebounce;
+          if (mod.spwIdleInit) spwIdleInit = mod.spwIdleInit;
+        })
+        .catch(() => {});
+    }
+    /**
+     * Persist a key-value pair to chrome.storage.sync, falling back to chrome.storage.local if sync fails.
+     * @param {string} key - The storage key to set.
+     * @param {*} value - The value to store for the given key.
+     * @returns {Promise<void>} Resolves with no value when the storage operation completes.
+     */
     function e(e, t) {
       return new Promise((n) => {
         const i = {};
@@ -43,9 +70,21 @@
       })();
       return (Array.isArray(e) && (i = e), i);
     }
+    /**
+     * Persist the current in-memory actions array to storage under the autopilot actions key.
+     *
+     * Writes the actions array to chrome storage and waits for the write operation to complete.
+     */
     async function l() {
       await e(n, i);
     }
+    const elementCache = new Map();
+    const getCachedElement = (id) => {
+      if (!elementCache.has(id)) {
+        elementCache.set(id, document.getElementById(id));
+      }
+      return elementCache.get(id);
+    };
     const s = {},
       r = {},
       c = {},
@@ -90,15 +129,34 @@
             t.appendChild(c[e]));
         },
       };
-    function w(e) {
-      let t;
-      return () => {
-        (clearTimeout(t), (t = setTimeout(e, 200)));
-      };
-    }
+    const pendingFieldIds = new Set();
+    const persistQueuedFields = spwDebounce(async () => {
+      await l();
+      pendingFieldIds.forEach((fieldId) => {
+        d.animateSuccess(fieldId);
+      });
+      pendingFieldIds.clear();
+    });
+    const queuePersist = (fieldId) => {
+      pendingFieldIds.add(fieldId);
+      persistQueuedFields();
+    };
+    const settingUpdates = new Map();
+    const persistSettings = spwDebounce(async () => {
+      const entries = Array.from(settingUpdates.entries());
+      settingUpdates.clear();
+      for (const [fieldId, value] of entries) {
+        await e(fieldId, value);
+        d.animateSuccess(fieldId);
+      }
+    });
+    const queueSettingUpdate = (fieldId, value) => {
+      settingUpdates.set(fieldId, value);
+      persistSettings();
+    };
     const p = ({ id: e }) => `action_${e}_url`;
     const m = (e) => {
-      const t = document.getElementById(p(e));
+      const t = getCachedElement(p(e));
       ["mass_follow", "mass_like", "mass_retweet"].includes(e.type)
         ? (t.style.display = "initial")
         : (t.style.display = "none");
@@ -108,29 +166,99 @@
     const y = ({ id: e }) => `action_${e}_idle_timeout`;
     const v = ({ id: e }) => `action_${e}_limit`;
     const M = ({ id: e }) => `action_${e}_remove`;
+    /**
+     * Attach the given action's id to its corresponding remove-button element's dataset.
+     *
+     * @param {{id: string|number}} e - Action object with an `id` property used to identify the DOM element.
+     */
     function g(e) {
-      const t = document.getElementById(M(e));
-      t.addEventListener("click", async () => {
-        (d.animateProcess(f(e)),
-          (t.disabled = !0),
-          (function ({ id: e }) {
-            (i.forEach((t, n) => {
-              t.id === e && i.splice(n, 1);
-            }),
-              i.forEach((e, t) => {
-                e.number = t + 1;
-              }));
-          })(e),
-          await l(),
-          t.closest(".action").remove(),
-          i.forEach((e) =>
-            (function (e) {
-              document.getElementById(k(e)).textContent = `#${e.number}`;
-            })(e),
-          ));
-      });
+      const t = getCachedElement(M(e));
+      if (t) {
+        t.dataset.actionId = e.id;
+      }
     }
     const h = document.getElementById("actions");
+    const getActionFromTarget = (target) => {
+      const actionId = target?.dataset?.actionId;
+      if (!actionId) return;
+      return i.find((action) => action.id === actionId);
+    };
+    const handleActionInput = (event) => {
+      const target = event.target;
+      const action = getActionFromTarget(target);
+      if (!action) return;
+      const fieldId = target.id;
+      if (fieldId === p(action)) {
+        action.url = target.value;
+        d.animateProcess(fieldId);
+        m(action);
+        queuePersist(fieldId);
+      } else if (fieldId === v(action)) {
+        action.limit = target.value;
+        d.animateProcess(fieldId);
+        queuePersist(fieldId);
+      } else if (fieldId === y(action)) {
+        action.idleTimeout = target.value;
+        d.animateProcess(fieldId);
+        queuePersist(fieldId);
+      }
+    };
+    const handleActionChange = (event) => {
+      const target = event.target;
+      const action = getActionFromTarget(target);
+      if (!action) return;
+      const fieldId = target.id;
+      if (fieldId === f(action)) {
+        action.type = target.value;
+        d.animateProcess(fieldId);
+        m(action);
+        queuePersist(fieldId);
+      }
+    };
+    const handleActionClick = async (event) => {
+      const button = event.target.closest('.button--remove');
+      if (!button) return;
+      const action = getActionFromTarget(button);
+      if (!action) return;
+      event.preventDefault();
+      d.animateProcess(f(action));
+      button.disabled = true;
+      i = i.filter((candidate) => candidate.id !== action.id);
+      i.forEach((entry, index) => {
+        entry.number = index + 1;
+        const label = getCachedElement(k(entry));
+        if (label) {
+          label.textContent = `#${entry.number}`;
+        }
+      });
+      pendingFieldIds.clear();
+      await l();
+      const row = button.closest('.action');
+      if (row) {
+        row.remove();
+      }
+    };
+    if (h) {
+      // SPW_EVENT_DELEGATION centralizes listeners to reduce handler churn per row
+      h.addEventListener('input', handleActionInput);
+      h.addEventListener('change', handleActionChange);
+      h.addEventListener('click', handleActionClick);
+    }
+    /**
+     * Create and insert a table row representing an autopilot action, populate its inputs, and initialize associated UI state.
+     *
+     * This function appends a new action row to the actions table, sets input/select values from the provided action object,
+     * attaches the action id to related elements' dataset, establishes field aliases for persistence, and initializes the row's
+     * visual state and controls so it is ready for user interaction.
+     *
+     * @param {Object} e - Action object to render.
+     * @param {string|number} e.id - Unique identifier for the action.
+     * @param {number} e.number - Sequential display number for the action label.
+     * @param {string} [e.type] - Preselected action type (e.g., "mass_follow").
+     * @param {string} [e.url] - Prepopulated URL for the action.
+     * @param {number} [e.limit] - Prepopulated numeric limit for the action.
+     * @param {number} [e.idleTimeout] - Prepopulated idle timeout value for the action.
+     */
     function A(e) {
       const t = document.createElement("tr");
       (t.classList.add("action"),
@@ -152,60 +280,37 @@
           d.create(f(e));
         })(e),
         (function (e) {
-          const t = document.getElementById(f(e));
-          (e.type && (t.value = e.type),
-            t.addEventListener("change", () => {
-              ((e.type = t.value), d.animateProcess(f(e)), m(e));
-            }),
-            t.addEventListener(
-              "change",
-              w(async () => {
-                (await l(), d.animateSuccess(f(e)));
-              }),
-            ));
+          const t = getCachedElement(f(e));
+          if (t) {
+            e.type && (t.value = e.type);
+            t.dataset.actionId = e.id;
+            m(e);
+          }
         })(e),
         (function (e) {
-          const t = document.getElementById(p(e));
-          (e.url && (t.value = e.url),
-            d.addAlias(p(e), f(e)),
-            t.addEventListener("input", () => {
-              ((e.url = t.value), d.animateProcess(p(e)));
-            }),
-            t.addEventListener(
-              "input",
-              w(async () => {
-                (await l(), d.animateSuccess(p(e)));
-              }),
-            ),
-            m(e));
+          const t = getCachedElement(p(e));
+          if (t) {
+            e.url && (t.value = e.url);
+            d.addAlias(p(e), f(e));
+            t.dataset.actionId = e.id;
+            m(e);
+          }
         })(e),
         (function (e) {
-          const t = document.getElementById(v(e));
-          (e.limit && (t.value = e.limit),
-            d.addAlias(v(e), f(e)),
-            t.addEventListener("input", () => {
-              ((e.limit = t.value), d.animateProcess(v(e)));
-            }),
-            t.addEventListener(
-              "input",
-              w(async () => {
-                (await l(), d.animateSuccess(v(e)));
-              }),
-            ));
+          const t = getCachedElement(v(e));
+          if (t) {
+            e.limit && (t.value = e.limit);
+            d.addAlias(v(e), f(e));
+            t.dataset.actionId = e.id;
+          }
         })(e),
         (function (e) {
-          const t = document.getElementById(y(e));
-          (e.idleTimeout && (t.value = e.idleTimeout),
-            d.addAlias(y(e), f(e)),
-            t.addEventListener("input", () => {
-              ((e.idleTimeout = t.value), d.animateProcess(y(e)));
-            }),
-            t.addEventListener(
-              "input",
-              w(async () => {
-                (await l(), d.animateSuccess(y(e)));
-              }),
-            ));
+          const t = getCachedElement(y(e));
+          if (t) {
+            e.idleTimeout && (t.value = e.idleTimeout);
+            d.addAlias(y(e), f(e));
+            t.dataset.actionId = e.id;
+          }
         })(e),
         g(e));
     }
@@ -354,10 +459,7 @@
       d.addAlias("retweetSkipReplies", "retweetSkipRetweets"),
       d.addAlias("unfollowPauseAfterSkipMax", "unfollowPauseAfterSkipMin"),
       d.addAlias("followPauseAfterSkipMax", "followPauseAfterSkipMin"));
-    const G = async (t, n) => {
-      (await e(t, n), d.animateSuccess(t));
-    };
-    (async () => {
+    const spwBootOptions = async () => {
       H();
       let e = await B();
       ((e = { ...e, ...(await W()) }),
@@ -368,22 +470,41 @@
         (e = { ...e, ...(await $(V)) }),
         Object.keys(e).forEach((t) => {
           const n = document.getElementById(t);
-          (d.create(t),
-            "checkbox" === n.type
-              ? ((n.checked = e[t]),
-                n.addEventListener("change", () => d.animateProcess(t)),
-                n.addEventListener(
-                  "change",
-                  w(() => G(t, n.checked)),
-                ))
-              : ((n.value = e[t]),
-                n.addEventListener("input", () => d.animateProcess(t)),
-                n.addEventListener(
-                  "input",
-                  w(() => G(t, n.value)),
-                )));
+          if (!n) return;
+          d.create(t);
+          if ("checkbox" === n.type) {
+            n.checked = e[t];
+            n.addEventListener('change', () => {
+              d.animateProcess(t);
+              queueSettingUpdate(t, n.checked);
+            });
+          } else {
+            n.value = e[t];
+            n.addEventListener('input', () => {
+              d.animateProcess(t);
+              queueSettingUpdate(t, n.value);
+            });
+          }
         }),
         await S());
-    })();
+    };
+
+    if (typeof window !== 'undefined' && typeof window.__SPW_TEST_HARNESS__ === 'function') {
+      window.__SPW_TEST_HARNESS__({
+        boot: spwBootOptions,
+        handleActionInput,
+        handleActionChange,
+        handleActionClick,
+        getActionFromTarget,
+        queueSettingUpdate,
+        queuePersist,
+        pendingFieldIds,
+        actions: i,
+      });
+    } else {
+      spwIdleInit(() => {
+        spwBootOptions();
+      });
+    }
   })();
 })();
