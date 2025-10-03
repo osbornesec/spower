@@ -199,7 +199,8 @@ function j(e){return e.legacy.followers_count}/**
  * @param {Object} e - Object containing a `relationship_perspectives` property with a `followed_by` flag.
  * @returns {boolean} `true` if `relationship_perspectives.followed_by` equals 1, `false` otherwise.
  */
-function B(e){return 1==e.relationship_perspectives.followed_by}/ **
+function B(e){return 1==e.relationship_perspectives.followed_by}
+/**
  * Compute the follower-to-following ratio for a user.
  * @param {Object} e - User object; expected to have `legacy.followers_count` and `legacy.friends_count`.
  * @returns {number|undefined} The result of `followers_count / friends_count`, or `undefined` if either count is missing or not a number.
