@@ -26,13 +26,13 @@ jobs:
         run: |
           mkdir -p "$HOME/.config/rclone"
           printf "%s" "$SERVICE_ACCOUNT_JSON" > "$HOME/.config/rclone/service-account.json"
-          cat <<'CONF' > "$HOME/.config/rclone/rclone.conf"
-[gdrive]
- type = drive
- scope = drive.file
- service_account_file = $HOME/.config/rclone/service-account.json
- root_folder_id = 1CdZMM4PGZuAB7tFeg3RlC6vxMXBh2rrD
-CONF
+          {
+            echo '[gdrive]'
+            echo 'type = drive'
+            echo 'scope = drive.file'
+            echo 'service_account_file = $HOME/.config/rclone/service-account.json'
+            echo 'root_folder_id = 1CdZMM4PGZuAB7tFeg3RlC6vxMXBh2rrD'
+          } > "$HOME/.config/rclone/rclone.conf"
 
       - name: Sync repository to Google Drive
         run: |
