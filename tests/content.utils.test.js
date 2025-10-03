@@ -1,33 +1,31 @@
 import { describe, it, expect } from 'vitest';
-import fs from 'fs';
-import path from 'path';
 
-const contentCode = fs.readFileSync(path.resolve(__dirname, '../content.js'), 'utf8');
+import { deepGet, requireKey } from '../src/shared/object.js';
+import { parseTimelineTweets } from '../src/shared/timeline.js';
+import { formatDuration, formatDurationWithMillis } from '../src/shared/time.js';
+import { resolveRestId } from '../src/shared/twitter.js';
+import {
+  appendSuspendedAutopilotAction,
+  getSuspendedAutopilotActions,
+} from '../src/shared/session.js';
+import {
+  getFollowerCount,
+  getFollowingCount,
+  isFollowedByPerspective,
+  followersToFollowingRatio,
+} from '../src/shared/user.js';
+import {
+  buildActiveActionMessage,
+  buildAutopilotProgressMessage,
+  buildFollowLimitMessage,
+  buildPauseMessage,
+  buildRepeatAutopilotMessage,
+  buildResumeAutopilotMessage,
+  buildSuccessMessage,
+  buildLimitReachedMessage,
+} from '../src/shared/messages.js';
 
-const extractFormatDuration = () => {
-  const match = contentCode.match(/const c=(e=>{[\s\S]*?});const u=/);
-  if (!match) throw new Error('Unable to locate formatDuration implementation');
-  return eval(`(${match[1]})`);
-};
-
-const extractDeepGet = () => {
-  const match = contentCode.match(/function b\(e,...t\)({[\s\S]*?})/);
-  if (!match) throw new Error('Unable to locate deep getter implementation');
-  return eval(`(function(e,...t)${match[1]})`);
-};
-
-const extractTimelineParser = (deepGetFn) => {
-  const match = contentCode.match(/function M\(e\)({[\s\S]*?})const I=/);
-  if (!match) throw new Error('Unable to locate timeline extractor');
-  // Ensure the evaluated function closes over the same deepGet helper that production code uses.
-  return eval(`((helper) => { const b = helper; return function(e)${match[1]}; })`)(deepGetFn);
-};
-
-describe('content.js utility behaviour', () => {
-  const formatDuration = extractFormatDuration();
-  const deepGet = extractDeepGet();
-  const parseTimelineTweets = extractTimelineParser(deepGet);
-
+describe('shared helper behaviour', () => {
   describe('formatDuration', () => {
     it('returns raw seconds when the value is under a minute', () => {
       expect(formatDuration(42)).toBe('42');
@@ -45,6 +43,13 @@ describe('content.js utility behaviour', () => {
     });
   });
 
+  describe('formatDurationWithMillis', () => {
+    it('appends millisecond precision to formatted seconds', () => {
+      expect(formatDurationWithMillis(1500)).toBe('1.500');
+      expect(formatDurationWithMillis(61542)).toBe('1:01.542');
+    });
+  });
+
   describe('deepGet helper', () => {
     it('walks nested structures when all keys are present', () => {
       const source = { a: { b: { c: 7 } } };
@@ -54,6 +59,24 @@ describe('content.js utility behaviour', () => {
     it('returns undefined when any step is missing', () => {
       const source = { a: {} };
       expect(deepGet(source, 'a', 'x', 'y')).toBeUndefined();
+    });
+
+    it('does not throw when encountering nullish segments', () => {
+      const source = { a: null };
+      expect(() => deepGet(source, 'a', 'b')).not.toThrow();
+      expect(deepGet(source, 'a', 'b')).toBeUndefined();
+    });
+  });
+
+  describe('requireKey helper', () => {
+    it('returns the value when the key exists', () => {
+      const source = { name: 'spw' };
+      expect(requireKey(source, 'name')).toBe('spw');
+    });
+
+    it('throws when the property is missing', () => {
+      const source = {};
+      expect(() => requireKey(source, 'missing')).toThrow(/missing/);
     });
   });
 
@@ -82,15 +105,118 @@ describe('content.js utility behaviour', () => {
         },
       };
 
-      expect(parseTimelineTweets(payload)).toEqual([
-        tweetEntity,
-        hiddenTweet.tweet,
-      ]);
+      expect(parseTimelineTweets(payload)).toEqual([tweetEntity, hiddenTweet.tweet]);
     });
 
     it('returns undefined when no instructions exist', () => {
       const payload = { data: { home: {} } };
       expect(parseTimelineTweets(payload)).toBeUndefined();
+    });
+
+    it('ignores entries without tweet results', () => {
+      const payload = {
+        data: {
+          home: {
+            home_timeline_urt: {
+              instructions: [
+                {
+                  type: 'TimelineAddEntries',
+                  entries: [{ content: { itemContent: {} } }],
+                },
+              ],
+            },
+          },
+        },
+      };
+
+      expect(parseTimelineTweets(payload)).toEqual([]);
+    });
+  });
+
+  describe('resolveRestId', () => {
+    it('returns the rest_id when present', () => {
+      expect(resolveRestId({ rest_id: '123' })).toBe('123');
+    });
+
+    it('dives through nested structures to resolve the id', () => {
+      const payload = { result: { tweet: { tweet_results: { result: { rest_id: '789' } } } } };
+      expect(resolveRestId(payload)).toBe('789');
+    });
+
+    it('returns undefined when no id exists', () => {
+      expect(resolveRestId({})).toBeUndefined();
+    });
+  });
+
+  describe('suspended autopilot helpers', () => {
+    it('returns an empty array when no data is stored', () => {
+      const storage = new Map();
+      storage.getItem = storage.get.bind(storage);
+      storage.setItem = storage.set.bind(storage);
+
+      expect(getSuspendedAutopilotActions(storage)).toEqual([]);
+    });
+
+    it('appends action types and persists them to storage', () => {
+      const storage = new Map();
+      storage.getItem = storage.get.bind(storage);
+      storage.setItem = storage.set.bind(storage);
+
+      appendSuspendedAutopilotAction('follow', storage);
+      appendSuspendedAutopilotAction('like', storage);
+
+      expect(getSuspendedAutopilotActions(storage)).toEqual(['follow', 'like']);
+    });
+  });
+
+  describe('user helpers', () => {
+    const user = { legacy: { followers_count: 100, friends_count: 20 } };
+
+    it('returns follower count', () => {
+      expect(getFollowerCount(user)).toBe(100);
+    });
+
+    it('returns following count', () => {
+      expect(getFollowingCount(user)).toBe(20);
+    });
+
+    it('calculates follower/following ratio', () => {
+      expect(followersToFollowingRatio(user)).toBe(5);
+    });
+
+    it('detects followed relationship perspective', () => {
+      expect(isFollowedByPerspective({ relationship_perspectives: { followed_by: 1 } })).toBe(true);
+      expect(isFollowedByPerspective({ relationship_perspectives: { followed_by: 0 } })).toBe(
+        false,
+      );
+    });
+  });
+
+  describe('status message helpers', () => {
+    it('builds resume and repeat messages', () => {
+      expect(buildResumeAutopilotMessage(1500)).toBe('Continuing autopilot in 1.500 ...');
+      expect(buildRepeatAutopilotMessage(120)).toBe('Repeating autopilot in 2:00 ...');
+    });
+
+    it('builds pause and limit messages', () => {
+      expect(buildPauseMessage('like', 90)).toBe('Unable to like. Continuing in 1:30 ...');
+      expect(buildFollowLimitMessage(60)).toBe(
+        'Twitter follow limit exceeded. Continuing in 1:00 ...',
+      );
+    });
+
+    it('builds autopilot progress and success messages', () => {
+      expect(buildAutopilotProgressMessage(2, 5)).toBe('Autopilot 2/5 ...');
+      expect(buildSuccessMessage('retweet', 7)).toBe('Successfully retweeted 7 Tweets');
+    });
+
+    it('builds daily limit reached message', () => {
+      expect(buildLimitReachedMessage(123)).toBe('You have reached the daily limit of 123');
+    });
+
+    it('builds active action messages', () => {
+      expect(buildActiveActionMessage('follow', 3, 10)).toBe('Follow 3/10 ...');
+      expect(buildActiveActionMessage('like', 5)).toBe('Like 5 ...');
     });
   });
 });

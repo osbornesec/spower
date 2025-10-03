@@ -17,6 +17,7 @@ Browser extension that automates high-volume actions on X (formerly Twitter): ma
 ```text
 app.js              # Background/page-level instrumentation shared via web-accessible resource
 content.js          # Content script injected on https://x.com/*
+src/shared/        # Shared helpers consumed by the content script and tests
 options.html|js|css # Extension options UI
 images/             # Icons & UI affordances (spinner/check)
 AGENTS.md           # Contributor quick reference
@@ -38,12 +39,17 @@ vitest.config.js    # Vitest configuration w/ jsdom environment & coverage setti
    ```bash
    npm test
    ```
-3. **Load in Chrome/Chromium**:
+3. **Bundle the content script**:
+   ```bash
+   npm run build
+   ```
+   _Tip_: run `npm run build:content:watch` during active development to rebuild on save.
+4. **Load in Chrome/Chromium**:
    - Open `chrome://extensions`.
    - Toggle **Developer mode** (top-right).
    - Click **Load unpacked** and select the repo root (`spower`).
    - Confirm "Superpowers for Twitter" appears with options page available.
-4. **Optional – Coverage report**:
+5. **Optional – Coverage report**:
    ```bash
    npm run test:coverage
    ```
@@ -66,6 +72,7 @@ Additional resources:
 
 ## Development Workflow
 - Use Node.js 18 LTS or newer (tested with npm 9+).
+- Use `npm run build:content:watch` when iterating on the content script to rebuild automatically.
 - Modify options UX via `options.*` and keep icons in `images/`.
 - Document architecture or feature decisions in `docs/ARCHITECTURE.md`.
 - Follow commit/PR guidelines in `docs/CONTRIBUTING.md`.

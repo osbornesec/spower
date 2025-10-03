@@ -6,7 +6,7 @@
             "content.css"
          ],
          "js": [
-            "content.js"
+            "dist/content.js"
          ],
          "matches": [
             "https://x.com/*"
