@@ -57,8 +57,8 @@ describe('shared dom selectors', () => {
       <button data-testid="42-unfollow"></button>
     `;
 
-    expect(findUserFollowButton('42', '@alice')).toBeInstanceOf(HTMLElement);
-    expect(findUserUnfollowButton('42', '@alice')).toBeInstanceOf(HTMLElement);
+    expect(findUserFollowButton('42')).toBeInstanceOf(HTMLElement);
+    expect(findUserUnfollowButton('42')).toBeInstanceOf(HTMLElement);
   });
 
   it('resolves user profile links with primary selector first', () => {
@@ -71,7 +71,7 @@ describe('shared dom selectors', () => {
       </div>
     `;
 
-    const anchor = findUserProfileLink('/alice', '@alice');
+    const anchor = findUserProfileLink('/alice');
     expect(anchor?.id).toBe('primary');
   });
 
@@ -82,7 +82,7 @@ describe('shared dom selectors', () => {
       </div>
     `;
 
-    const anchor = findUserProfileLink('/bob', '@bob');
+    const anchor = findUserProfileLink('/bob');
     expect(anchor?.id).toBe('fallback');
   });
 
@@ -95,7 +95,7 @@ describe('shared dom selectors', () => {
       </div>
     `;
 
-    const anchor = findModalUserProfileLink('/carol', '@carol');
+    const anchor = findModalUserProfileLink('/carol');
     expect(anchor?.id).toBe('modal');
   });
 

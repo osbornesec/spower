@@ -18,26 +18,26 @@ export const findTweetStatusLink = (statusId) => {
   return document.querySelector(selector);
 };
 
-export const findUserFollowButton = (restId, label = restId) => {
+export const findUserFollowButton = (restId) => {
   if (!restId) return null;
   const selector = `[data-testid="${restId}-follow"]`;
   return document.querySelector(selector);
 };
 
-export const findUserUnfollowButton = (restId, label = restId) => {
+export const findUserUnfollowButton = (restId) => {
   if (!restId) return null;
   const selector = `[data-testid="${restId}-unfollow"]`;
   return document.querySelector(selector);
 };
 
-export const findUserProfileLink = (profilePath, label = profilePath) => {
+export const findUserProfileLink = (profilePath) => {
   if (!profilePath) return null;
   const primarySelector = `[data-testid="cellInnerDiv"] a[href="${profilePath}"][role="link"]`;
   const fallbackSelector = `[data-testid="UserCell"] a[href="${profilePath}"][role="link"]`;
   return document.querySelector(primarySelector) || document.querySelector(fallbackSelector);
 };
 
-export const findModalUserProfileLink = (profilePath, label = profilePath) => {
+export const findModalUserProfileLink = (profilePath) => {
   if (!profilePath) return null;
   const selector = `[aria-modal="true"] [data-testid="UserCell"] a[href="${profilePath}"][role="link"]:not([dir])`;
   return document.querySelector(selector);

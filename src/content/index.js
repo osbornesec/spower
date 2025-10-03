@@ -605,17 +605,17 @@ import {
      * @param {*} e - A user identifier or user-like object used to derive the element's test id.
      * @returns {Element|null} The matching follow button element, or `null` if none is found.
      */
-    const resolveFollowButton = (e) => findUserFollowButton(V(e), P(e)); /**
+    const resolveFollowButton = (e) => findUserFollowButton(V(e)); /**
      * Finds the profile link element for a given user on the page.
      * @param {*} e - User identifier or object from which the profile href is derived.
      * @returns {Element|null} The anchor element pointing to the user's profile if found, `null` otherwise.
      */
-    const resolveProfileLink = (e) => findUserProfileLink(H(e), P(e)); /**
+    const resolveProfileLink = (e) => findUserProfileLink(H(e)); /**
      * Finds the profile link element for a user inside an open modal UserCell.
      * @param {object|string} user - A user identifier or object used to derive the profile href.
      * @returns {HTMLAnchorElement|null} The matching anchor element, or null if no match is found.
      */
-    const resolveModalProfileLink = (e) => findModalUserProfileLink(H(e), P(e)); /**
+    const resolveModalProfileLink = (e) => findModalUserProfileLink(H(e)); /**
      * Locate the nearest user cell DOM element related to the given action item.
      * @param {{focusableEl: Element}} e - Object that contains the element used for focus/navigation.
      * @returns {Element|null} The closest ancestor with `data-testid="UserCell"`, or `null` if none is found.
@@ -1593,7 +1593,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
           Ze(ke(e));
           const t = await Wt(e, n);
           if (1 == t) {
-            const t = findUserUnfollowButton(V(e), P(e));
+            const t = findUserUnfollowButton(V(e));
             if (!t) return ze('unfollow button not found');
             t.click();
             ((await E(() => Gt(), 1e3)).click(), Qn(), Ye('successfully unfollowed'));
