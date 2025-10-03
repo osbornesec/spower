@@ -88,7 +88,7 @@ describe('README.md Validation', () => {
     it('should reference existing core files', () => {
       const coreFiles = [
         'app.js',
-        'content.js',
+        'dist/content.js',
         'options.html',
         'options.js',
         'options.css',
