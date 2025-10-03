@@ -41,4 +41,21 @@ describe('perf helpers honour SPW_DEV flag', () => {
     expect(measureSpy).toHaveBeenCalled();
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('[SPW_PERF] range'));
   });
+
+  it('handles errors in spwMeasure', async () => {
+    localStorage.setItem('spw_dev', '1');
+    const measureSpy = vi
+      .spyOn(performance, 'measure')
+      .mockImplementation(() => {
+        throw new Error('test error');
+      });
+
+    vi.resetModules();
+    const { spwMeasure } = await import('../utils/perf.js');
+
+    // This should not throw an error.
+    spwMeasure('test', 'start', 'end');
+
+    expect(measureSpy).toHaveBeenCalled();
+  });
 });
