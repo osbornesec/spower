@@ -145,7 +145,7 @@ const spwCurrentPageKey = () => {
   const normalizedLabel = rawLabel.replace(/\s+/g, ' ');
   return `${hrefKey}::${spwNormalizeKey(normalizedLabel)}`;
 };
-u.classList.add("sft-status-bar__label");const spwInitialStatePattern=/window.__INITIAL_STATE__=({[\s\S]*?});window.__META_DATA__/;let h=globalThis.__INITIAL_STATE__&&"object"==typeof globalThis.__INITIAL_STATE__?globalThis.__INITIAL_STATE__:void 0;if(!h){document.querySelectorAll("script").forEach((e=>{if(h)return;const t=e.textContent||"";if(!t.includes("__INITIAL_STATE__"))return;const n=t.match(spwInitialStatePattern);if(n&&n[1])try{h=JSON.parse(n[1])}catch(e){console.warn("[SPW] failed to parse __INITIAL_STATE__ payload",e)}}))}if(!h){console.warn("[SPW] initial state unavailable; skipping bootstrap");return}const x=h.session,R=b(h,"entities","users","entities"),L=()=>F(x,"user_id");/**
+u.classList.add("sft-status-bar__label");const spwInitialStatePattern=/window.__INITIAL_STATE__=({[\s\S]*?});window.__META_DATA__/;let h=globalThis.__INITIAL_STATE__&&"object"==typeof globalThis.__INITIAL_STATE__?globalThis.__INITIAL_STATE__:void 0;if(!h){for(const e of document.querySelectorAll("script")){const t=e.textContent||"";if(!t.includes("__INITIAL_STATE__"))continue;const n=t.match(spwInitialStatePattern);if(n&&n[1]){try{h=JSON.parse(n[1]);break;}catch(e){console.warn("[SPW] failed to parse __INITIAL_STATE__ payload",e);}}}}if(!h){console.warn("[SPW] initial state unavailable; skipping bootstrap");return}const x=h.session,R=b(h,"entities","users","entities"),L=()=>F(x,"user_id");/**
  * Get the current user's screen name.
  * @returns {string|undefined} The user's screen_name if available, otherwise `undefined`.
  */

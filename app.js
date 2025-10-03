@@ -34,32 +34,60 @@
     return `${hrefKey}::${normalizedLabel.toUpperCase()}`;
   };
 
+  const OPEN_FLAG = '__spwInstrumentedOpen__';
+  const SEND_FLAG = '__spwInstrumentedSend__';
+
+  const markInstrumented = (fn, flag) => {
+    try {
+      Object.defineProperty(fn, flag, { value: true, configurable: true });
+    } catch {
+      fn[flag] = true;
+    }
+  };
+
   const instrumentOpen = () => {
+    if (XMLHttpRequest.prototype.open[OPEN_FLAG]) return;
     const originalOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function (method, url) {
       this.url = url;
       this.origin = computeOriginKey();
       return originalOpen.apply(this, arguments);
     };
+    markInstrumented(XMLHttpRequest.prototype.open, OPEN_FLAG);
   };
   instrumentOpen();
 
   const instrumentSend = () => {
+    if (XMLHttpRequest.prototype.send[SEND_FLAG]) return;
     const originalSend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function (body) {
       this.addEventListener(
         'load',
         () => {
           if (this.responseType === 'document') return;
-          window.postMessage(
-            { body, origin: this.origin, response: this.response, status: this.status, url: this.url },
-            window.location.origin,
-          );
+          const payload = {
+            body,
+            origin: this.origin,
+            response: this.response,
+            status: this.status,
+            url: this.url,
+          };
+          try {
+            window.postMessage(payload, window.location.origin);
+          } catch (error) {
+            if (error && error.name === 'DataCloneError') {
+              delete payload.body;
+              window.postMessage(payload, window.location.origin);
+              return;
+            }
+            throw error;
+          }
         },
         { passive: !0 /* SPW_PASSIVE_LISTENERS */ },
       );
       return originalSend.apply(this, arguments);
     };
+    markInstrumented(XMLHttpRequest.prototype.send, SEND_FLAG);
   };
   instrumentSend();
 
@@ -69,7 +97,7 @@
       clearInterval(watchdog);
       return;
     }
-    XMLHttpRequest.prototype.open.toString().includes('this.origin = computeOriginKey()') || instrumentOpen();
-    XMLHttpRequest.prototype.send.toString().includes('origin: this.origin') || instrumentSend();
+    instrumentOpen();
+    instrumentSend();
   }, 100);
 })();

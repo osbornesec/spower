@@ -40,7 +40,12 @@ const measureOnce = async () => {
   window.requestIdleCallback = window.requestIdleCallback || ((fn) => setTimeout(() => fn({ didTimeout: false, timeRemaining: () => 16 }), 1));
   window.cancelIdleCallback = window.cancelIdleCallback || ((id) => clearTimeout(id));
   window.requestAnimationFrame = window.requestAnimationFrame || ((fn) => setTimeout(fn, 16));
-  window.chrome = { runtime: { getURL: () => undefined } };
+  const extensionOrigin = 'chrome-extension://spower-perf-harness';
+  window.chrome = {
+    runtime: {
+      getURL: (resourcePath = '') => new URL(resourcePath, `${extensionOrigin}/`).toString(),
+    },
+  };
 
   window.XMLHttpRequest = function XMLHttpRequest() {};
   window.XMLHttpRequest.prototype = {
