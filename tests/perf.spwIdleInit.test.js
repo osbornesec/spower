@@ -1,12 +1,25 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { spwIdleInit } from '../utils/perf';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+import { spwIdleInit } from '../utils/perf.js';
 
 describe('spwIdleInit', () => {
+  let originalRequestIdleCallback;
+
   beforeEach(() => {
     vi.useFakeTimers();
+    originalRequestIdleCallback = globalThis.requestIdleCallback;
   });
 
-  it('should use requestIdleCallback when available', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    if (originalRequestIdleCallback === undefined) {
+      delete globalThis.requestIdleCallback;
+    } else {
+      globalThis.requestIdleCallback = originalRequestIdleCallback;
+    }
+  });
+
+  it('uses requestIdleCallback when available', () => {
     const fn = vi.fn();
     globalThis.requestIdleCallback = vi.fn((cb) => cb());
 
@@ -14,11 +27,11 @@ describe('spwIdleInit', () => {
 
     expect(globalThis.requestIdleCallback).toHaveBeenCalled();
     expect(fn).toHaveBeenCalled();
-
-    delete globalThis.requestIdleCallback;
   });
 
-  it('should use setTimeout as a fallback', () => {
+  it('falls back to setTimeout when requestIdleCallback is missing', () => {
+    delete globalThis.requestIdleCallback;
+
     const fn = vi.fn();
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
 
