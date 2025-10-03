@@ -40,7 +40,7 @@
   const markInstrumented = (fn, flag) => {
     try {
       Object.defineProperty(fn, flag, { value: true, configurable: true });
-    } catch {
+    } catch (e) {
       fn[flag] = true;
     }
   };
