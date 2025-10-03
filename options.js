@@ -239,7 +239,7 @@
       }
     };
     if (h) {
-      // SPW_EVENT_DELEGATION centralizes listeners to reduce handler churn per row
+      // XF_EVENT_DELEGATION centralizes listeners to reduce handler churn per row
       h.addEventListener('input', handleActionInput);
       h.addEventListener('change', handleActionChange);
       h.addEventListener('click', handleActionClick);

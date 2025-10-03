@@ -83,7 +83,7 @@
             throw error;
           }
         },
-        { passive: !0 /* SPW_PASSIVE_LISTENERS */ },
+        { passive: !0 /* XF_PASSIVE_LISTENERS */ },
       );
       return originalSend.apply(this, arguments);
     };

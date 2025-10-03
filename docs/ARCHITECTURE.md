@@ -28,7 +28,7 @@ XFlow is a Manifest V3 browser extension that orchestrates automation flows acro
    - Focus management (`D`, `C` helpers) iterates over DOM nodes, performing actions with randomised pauses to mimic human behaviour.
    - `app.js` telemetry broadcasts XHR payloads, enabling monitoring or downstream analytics.
 5. **Persistence & recovery**:
-   - Action types persist in `sessionStorage` (`SuperpowersForTwitterSuspendedAutopilotActionTypes`) to resume after reloads.
+   - Action types persist in `sessionStorage` (`XFlowSuspendedAutopilotActionTypes`) to resume after reloads.
    - No remote activation checks are performed; configuration lives entirely in extension storage.
 
 ## Data Storage Responsibilities

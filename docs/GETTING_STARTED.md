@@ -46,7 +46,7 @@ npm run test:coverage
 
 ## 7. Start Experimenting on X (Twitter)
 - Navigate to `https://x.com/`.
-- Ensure the content script is active by checking DevTools → Console for `Superpowers` log entries.
+- Ensure the content script is active by checking DevTools → Console for `XFlow` log entries.
 - Autopilot controls appear in the UI once configured.
 
 ## 8. Cleaning Up
