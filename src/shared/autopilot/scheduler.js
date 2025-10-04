@@ -64,9 +64,9 @@ export const pickRandomDelaySeconds = (minMinutes, maxMinutes, selectValue) => {
   const max = Number.parseFloat(maxMinutes);
   if (!Number.isFinite(min) || !Number.isFinite(max)) return 0;
 
-  const [lo, hi] = min <= max ? [min, max] : [max, min];
-  let seconds = 60 * lo;
-  const target = 60 * hi;
+  const [lowerBoundMinutes, upperBoundMinutes] = min <= max ? [min, max] : [max, min];
+  let seconds = 60 * lowerBoundMinutes;
+  const target = 60 * upperBoundMinutes;
   const candidates = [seconds];
   while (seconds < target) {
     seconds += 60;

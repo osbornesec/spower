@@ -28,10 +28,14 @@ describe('options.js delegated events', () => {
     });
 
     chrome.storage.sync.set = vi.fn((_items, callback) => {
-      callback && callback();
+      if (callback) {
+        callback();
+      }
     });
     chrome.storage.local.set = vi.fn((_items, callback) => {
-      callback && callback();
+      if (callback) {
+        callback();
+      }
     });
 
     global.__XF_TEST_HARNESS__ = (exports) => {

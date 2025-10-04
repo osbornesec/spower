@@ -34,9 +34,9 @@ describe('shared dom selectors', () => {
       </div>
     `;
 
-    const el = findSelectedHomeTab();
-    expect(el).toBeInstanceOf(HTMLElement);
-    expect(el?.textContent).toBe('Following');
+    const selectedTabElement = findSelectedHomeTab();
+    expect(selectedTabElement).toBeInstanceOf(HTMLElement);
+    expect(selectedTabElement?.textContent).toBe('Following');
   });
 
   it('returns tweet status links by identifier', () => {

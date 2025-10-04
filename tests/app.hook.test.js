@@ -86,8 +86,8 @@ describe('app.js XMLHttpRequest instrumentation', () => {
 
   it('reapplies instrumentation if the open method is overwritten', () => {
     const originalOpen = FakeXMLHttpRequest.prototype.open;
-    const hijackedOpen = function hijackedOpen() {
-      return originalOpen.apply(this, arguments);
+    const hijackedOpen = function hijackedOpen(...openArgs) {
+      return originalOpen.apply(this, openArgs);
     };
     XMLHttpRequest.prototype.open = hijackedOpen;
 
@@ -223,8 +223,8 @@ describe('app.js XMLHttpRequest instrumentation', () => {
 
     // Now, hijack the open method.
     const originalOpen = XMLHttpRequest.prototype.open;
-    const hijackedOpen = function hijackedOpen() {
-      return originalOpen.apply(this, arguments);
+    const hijackedOpen = function hijackedOpen(...openArgs) {
+      return originalOpen.apply(this, openArgs);
     };
     XMLHttpRequest.prototype.open = hijackedOpen;
     expect(XMLHttpRequest.prototype.open).toBe(hijackedOpen);

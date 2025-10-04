@@ -9,7 +9,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 const buildContent = async () => {
   try {
-    const config = {
+    const esbuildConfig = {
       entryPoints: [path.resolve(projectRoot, 'src/content/index.js')],
       bundle: true,
       outfile: path.resolve(projectRoot, 'dist/content.js'),
@@ -30,11 +30,11 @@ const buildContent = async () => {
         process.exitCode = 1;
         return;
       }
-      const ctx = await context(config);
-      await ctx.watch();
+      const watchContext = await context(esbuildConfig);
+      await watchContext.watch();
       console.log('[build-content] Watching for changes... (press Ctrl+C to exit)');
     } else {
-      await build(config);
+      await build(esbuildConfig);
     }
   } catch (error) {
     console.error('[build-content] Failed to bundle content script');

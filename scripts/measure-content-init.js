@@ -2,7 +2,7 @@
 
 const { readFileSync } = require('node:fs');
 const path = require('node:path');
-const vm = require('node:vm');
+const vmModule = require('node:vm');
 const { performance } = require('node:perf_hooks');
 const { JSDOM } = require('jsdom');
 
@@ -40,9 +40,10 @@ const measureOnce = async () => {
   window.localStorage.setItem('xf_dev', '1');
   window.requestIdleCallback =
     window.requestIdleCallback ||
-    ((fn) => setTimeout(() => fn({ didTimeout: false, timeRemaining: () => 16 }), 1));
-  window.cancelIdleCallback = window.cancelIdleCallback || ((id) => clearTimeout(id));
-  window.requestAnimationFrame = window.requestAnimationFrame || ((fn) => setTimeout(fn, 16));
+    ((callback) => setTimeout(() => callback({ didTimeout: false, timeRemaining: () => 16 }), 1));
+  window.cancelIdleCallback = window.cancelIdleCallback || ((timeoutId) => clearTimeout(timeoutId));
+  window.requestAnimationFrame =
+    window.requestAnimationFrame || ((callback) => setTimeout(callback, 16));
   const extensionOrigin = 'chrome-extension://xflow-perf-harness';
   window.chrome = {
     runtime: {
@@ -74,43 +75,45 @@ const measureOnce = async () => {
   const originalWindowSetInterval = window.setInterval.bind(window);
 
   window.setTimeout = (...args) => {
-    const id = originalWindowSetTimeout(...args);
-    trackedTimeouts.push(id);
-    return id;
+    const timeoutIdentifier = originalWindowSetTimeout(...args);
+    trackedTimeouts.push(timeoutIdentifier);
+    return timeoutIdentifier;
   };
 
   window.setInterval = (...args) => {
-    const id = originalWindowSetInterval(...args);
-    trackedIntervals.push(id);
-    return id;
+    const intervalIdentifier = originalWindowSetInterval(...args);
+    trackedIntervals.push(intervalIdentifier);
+    return intervalIdentifier;
   };
 
   global.setTimeout = (...args) => {
-    const id = realSetTimeout(...args);
-    trackedTimeouts.push(id);
-    return id;
+    const timeoutIdentifier = realSetTimeout(...args);
+    trackedTimeouts.push(timeoutIdentifier);
+    return timeoutIdentifier;
   };
 
   global.setInterval = (...args) => {
-    const id = realSetInterval(...args);
-    trackedIntervals.push(id);
-    return id;
+    const intervalIdentifier = realSetInterval(...args);
+    trackedIntervals.push(intervalIdentifier);
+    return intervalIdentifier;
   };
 
-  const context = vm.createContext(window);
+  const context = vmModule.createContext(window);
   const start = performance.now();
 
   try {
-    vm.runInContext(source, context, { filename: absolutePath });
+    vmModule.runInContext(source, context, { filename: absolutePath });
   } catch (error) {
     console.error('Execution error:', error.message);
   }
 
-  await new Promise((resolve) => realSetTimeout(resolve, 20));
+  await new Promise((resolve) => {
+    realSetTimeout(resolve, 20);
+  });
 
   const end = performance.now();
-  trackedIntervals.forEach((id) => clearInterval(id));
-  trackedTimeouts.forEach((id) => clearTimeout(id));
+  trackedIntervals.forEach((intervalIdentifier) => clearInterval(intervalIdentifier));
+  trackedTimeouts.forEach((timeoutIdentifier) => clearTimeout(timeoutIdentifier));
 
   global.setTimeout = realSetTimeout;
   global.setInterval = realSetInterval;
@@ -121,17 +124,19 @@ const measureOnce = async () => {
 };
 
 const run = async () => {
-  for (let i = 0; i < runs; i += 1) {
+  for (let runIndex = 0; runIndex < runs; runIndex += 1) {
     const duration = await measureOnce();
     results.push(duration);
   }
 
-  results.sort((a, b) => a - b);
+  results.sort((firstDuration, secondDuration) => firstDuration - secondDuration);
   const median = results[Math.floor(results.length / 2)];
-  const average = results.reduce((sum, value) => sum + value, 0) / results.length;
+  const average = results.reduce((sum, durationValue) => sum + durationValue, 0) / results.length;
 
   console.log(`Measured ${runs} runs for ${filePath}`);
-  console.log(`Durations (ms): ${results.map((v) => v.toFixed(2)).join(', ')}`);
+  console.log(
+    `Durations (ms): ${results.map((durationValue) => durationValue.toFixed(2)).join(', ')}`,
+  );
   console.log(`Average: ${average.toFixed(2)}ms`);
   console.log(`Median: ${median.toFixed(2)}ms`);
 };

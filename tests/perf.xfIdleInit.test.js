@@ -20,27 +20,27 @@ describe('xfIdleInit', () => {
   });
 
   it('uses requestIdleCallback when available', () => {
-    const fn = vi.fn();
-    globalThis.requestIdleCallback = vi.fn((cb) => cb());
+    const callbackSpy = vi.fn();
+    globalThis.requestIdleCallback = vi.fn((callback) => callback());
 
-    xfIdleInit(fn);
+    xfIdleInit(callbackSpy);
 
     expect(globalThis.requestIdleCallback).toHaveBeenCalled();
-    expect(fn).toHaveBeenCalled();
+    expect(callbackSpy).toHaveBeenCalled();
   });
 
   it('falls back to setTimeout when requestIdleCallback is missing', () => {
     delete globalThis.requestIdleCallback;
 
-    const fn = vi.fn();
+    const callbackSpy = vi.fn();
     const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
 
-    xfIdleInit(fn);
+    xfIdleInit(callbackSpy);
 
     expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 0);
 
     vi.runAllTimers();
 
-    expect(fn).toHaveBeenCalled();
+    expect(callbackSpy).toHaveBeenCalled();
   });
 });
