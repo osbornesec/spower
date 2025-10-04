@@ -22,3 +22,13 @@ When you need to call tools from the shell, use this rubric:
 - YAML/XML: `yq`
 
 If `ast-grep` is available, avoid plain‑text searches (`rg`/`grep`) when you need syntax‑aware matching. Use `rg` only when a plain‑text search is explicitly requested.
+
+## Building and loading the XFlow extension
+
+- The content script is bundled: `manifest.json` loads `dist/content.js`, built from `src/content/index.js` via `scripts/build-content.js` (esbuild).
+- Build steps:
+  - `npm install`
+  - `npm run build:content` (or `npm run build:content:watch`)
+- Load in Chrome: Extensions → enable Developer mode → Load unpacked → select the repo root.
+- Static assets used as-is: `app.js` (web_accessible), `options.html/js`, `content.css`, `utils/perf.js`.
+- Rebuild after changing files under `src/`; static files above do not require bundling.

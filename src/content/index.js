@@ -123,6 +123,16 @@ import {
     xfMeasure('XF_PERF_CONTENT_INIT', 'XF_PERF_START', 'XF_PERF_END');
   };
   xfIdleInit(xfFinalize);
+  const XF_DEBUG = (() => {
+    try {
+      return globalThis.localStorage?.getItem('xf_debug') === '1';
+    } catch {
+      return false;
+    }
+  })();
+  const xfDbg = (...args) => {
+    if (XF_DEBUG) console.log('[XF_DBG]', ...args);
+  };
   (() => {
     /**
      * Pause for the given number of milliseconds.
@@ -350,18 +360,21 @@ import {
           }));
         if (void 0 === t()) return;
         const o = t()[i];
+        try { xfDbg('D(step)', { index: i, hasItem: void 0 !== o }); } catch {}
         if (void 0 === o)
           await q({ callback: e, getList: t, getFocusableEl: n, index: i, milliseconds: 100 });
         else {
           try {
             ((o.focusableEl = await E(() => n(o), 2e3)), (A = window.scrollY));
           } catch (o) {
-            (console.log(o), A && window.scrollTo(0, A));
+            (console.log(o), xfDbg('D(getFocusableEl:fail)', { index: i }), A && window.scrollTo(0, A));
             const l = await C({ fromIndex: i + 1, getList: t, getFocusableEl: n });
             return void (await D({ callback: e, getList: t, getFocusableEl: n, index: l }));
           }
           (o.focusableEl.focus(),
+            xfDbg('D(callback:invoke)', { index: i }),
             await e(o, i),
+            xfDbg('D(next)', { nextIndex: i + 1 }),
             await D({ callback: e, getList: t, getFocusableEl: n, index: i + 1 }));
         }
       },
@@ -377,6 +390,9 @@ import {
     async function U({ callback: e, getFocusableEl: t, getList: n }) {
       A = void 0;
       const i = await C({ getList: n, getFocusableEl: t });
+      try {
+        xfDbg('U(start)', { index: i, listLength: Array.isArray(n?.()) ? n().length : undefined });
+      } catch {}
       await D({ callback: e, getList: n, getFocusableEl: t, index: i });
     }
     const P = (e) => F(e.core, 'screen_name'); /**
@@ -1167,11 +1183,19 @@ import {
     function vt(e, t) {
       return t.includes(`@${P(e).toUpperCase()}`);
     } /**
- * Record a timestamped action for the given entity and advance the autopilot flow.
- * 
- * Persists an object containing the current timestamp, the current creator id, and the user id resolved from the provided entity, then invokes the continuation handler.
- * @param {any} e - Entity object from which a user id is resolved.
-function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V(e)};je(nt,t)}(e),Qn()}/**
+     * Record a timestamped action for the given entity and advance the autopilot flow.
+     *
+     * Persists an object containing the current timestamp, the current creator id, and the user id resolved from the provided entity, then invokes the continuation handler.
+     *
+     * @param {any} e - Entity object from which a user id is resolved.
+     */
+    function Tt(e) {
+      !(function (e) {
+        const t = { createdAt: Date.now(), creatorId: L(), userId: V(e) };
+        je(nt, t);
+      })(e),
+        Qn();
+    } /**
  * Determine whether a target user passes configured follow guards or return a reason to skip.
  *
  * Evaluates the provided user object against multiple follow-related rules in the options object (e.g., bio required, verified skip, protected requirements, follower/following thresholds, black/white lists, prior follow checks) and returns `true` when all checks allow following or a short string explaining the first failing condition.
@@ -1271,6 +1295,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
     async function $t(e, t) {
       let n;
       const i = oe(e);
+      try { xfDbg('FollowAttempt', { user: P(i), userId: V(i) }); } catch {}
       if (
         ((n =
           t.tweetLanguageWhitelist && !Ge(e, t.tweetLanguageWhitelist)
@@ -1281,26 +1306,27 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
         let n;
         Jn(H(i));
         const userAnchor = findTweetUserAnchor(e.focusableEl, H(oe(e)));
-        userAnchor && userAnchor.click();
+        userAnchor && (xfDbg('FollowAttempt:openUser', { clicked: true }), userAnchor.click());
         try {
           n = await E(() => resolveFollowButton(i), 2e3);
         } catch (e) {
-          console.log(e);
+          (console.log(e), xfDbg('FollowAttempt:resolveButton:fail'));
         }
         if (
           (n && n.click(),
           window.history.back(),
-          await E(() => Yn()),
-          (e.focusableEl = await E(() => resolveTweetStatusLink(e))),
+          await E(() => Yn(), 4e3),
+          (e.focusableEl = await E(() => resolveTweetStatusLink(e), 4e3)),
           e.focusableEl.focus(),
           Ze(resolveTweetFooter(e)),
           !n)
         )
           return ze('follow button not found');
-        (Tt(i), Ye('successfully followed'));
+        (Tt(i), xfDbg('FollowAttempt:success', { userId: V(i) }), Ye('successfully followed'));
         const o = He(t.intervalDurationRange);
+        xfDbg('FollowAttempt:delay', { ms: o });
         await Vn(o);
-      } else (Ze(resolveTweetFooter(e)), n && (ze(n), await Vn(500)));
+      } else (Ze(resolveTweetFooter(e)), n && (xfDbg('FollowAttempt:skip', { reason: n }), ze(n), await Vn(500)));
     }
     xt.addEventListener('click', async () => {
       (p(), qt(), Rt(), pt(), await ht());
@@ -1414,7 +1440,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
                     }
                     (i && (i.click(), Tt(t)),
                       window.history.back(),
-                      await E(() => Yn()),
+                      await E(() => Yn(), 4e3),
                       await Mt(n));
                   }
                   if ((Ze(ke(t)), !i)) return ze('follow button not found');
@@ -1711,7 +1737,7 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
             const t = getTweetActionButton(e.focusableEl, 'unretweet');
             if (!t) return !1;
             t.click();
-            ((await E(() => on())).click(), Qn(), tt(e, 'successfully unretweeted'));
+            ((await E(() => on(), 4e3)).click(), Qn(), tt(e, 'successfully unretweeted'));
             const i = He(n.intervalDurationRange);
             await Vn(i);
           } else o && (et(e, o), await Vn(500));
@@ -2041,7 +2067,10 @@ function Tt(e){!function(e){const t={createdAt:Date.now(),creatorId:L(),userId:V
      */
     function Qn() {
       ((Tn += 1),
-        Mn && Mn <= Tn ? ((Un = !0), Fn()) : $n && Tn + In >= $n ? ((Un = !0), i(), hn()) : xn(),
+        xfDbg('Qn(progress)', { Tn, sessionLimit: Mn, dailyLimit: $n, dailySoFar: In }),
+        Mn && Mn <= Tn ? ((Un = !0), xfDbg('Qn(stop:sessionLimitReached)', { Tn, Mn }), Fn()) :
+        $n && Tn + In >= $n ? ((Un = !0), xfDbg('Qn(stop:dailyLimitReached)', { Tn, In, $n }), i(), hn()) :
+        xn(),
         Wn());
     } /**
      * Check whether the current page matches the stored page key or the configured pathname.

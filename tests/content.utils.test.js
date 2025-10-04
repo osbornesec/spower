@@ -131,6 +131,76 @@ describe('shared helper behaviour', () => {
 
       expect(parseTimelineTweets(payload)).toEqual([]);
     });
+
+    it('parses TweetDetail threaded conversation instructions', () => {
+      const tweetEntity = { rest_id: '42', legacy: { full_text: 'conversation tweet' } };
+      const payload = {
+        data: {
+          threaded_conversation_with_injections: {
+            instructions: [
+              {
+                type: 'TimelineAddEntries',
+                entries: [
+                  { content: { itemContent: { tweet_results: { result: tweetEntity } } } },
+                ],
+              },
+            ],
+          },
+        },
+      };
+
+      expect(parseTimelineTweets(payload)).toEqual([tweetEntity]);
+    });
+
+    it('collects tweet payloads from TimelineAddToModule instructions', () => {
+      const tweetEntity = { rest_id: '7', legacy: { full_text: 'module tweet' } };
+      const payload = {
+        data: {
+          threaded_conversation_with_injections_v2: {
+            instructions: [
+              {
+                type: 'TimelineAddToModule',
+                moduleItems: [
+                  { item: { itemContent: { tweet_results: { result: tweetEntity } } } },
+                ],
+              },
+            ],
+          },
+        },
+      };
+
+      expect(parseTimelineTweets(payload)).toEqual([tweetEntity]);
+    });
+
+    it('collects tweet payloads from module entries within TimelineAddEntries (content.items)', () => {
+      const tweetEntity = { rest_id: '10', legacy: { full_text: 'items tweet' } };
+      const hiddenTweet = { __typename: 'TweetWithVisibilityResults', tweet: { rest_id: '11' } };
+      const payload = {
+        data: {
+          home: {
+            home_timeline_urt: {
+              instructions: [
+                {
+                  type: 'TimelineAddEntries',
+                  entries: [
+                    {
+                      content: {
+                        items: [
+                          { item: { itemContent: { tweet_results: { result: tweetEntity } } } },
+                          { item: { itemContent: { tweet_results: { result: hiddenTweet } } } },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      };
+
+      expect(parseTimelineTweets(payload)).toEqual([tweetEntity, hiddenTweet.tweet]);
+    });
   });
 
   describe('resolveRestId', () => {
