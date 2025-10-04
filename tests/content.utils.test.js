@@ -171,6 +171,36 @@ describe('shared helper behaviour', () => {
 
       expect(parseTimelineTweets(payload)).toEqual([tweetEntity]);
     });
+
+    it('collects tweet payloads from module entries within TimelineAddEntries (content.items)', () => {
+      const tweetEntity = { rest_id: '10', legacy: { full_text: 'items tweet' } };
+      const hiddenTweet = { __typename: 'TweetWithVisibilityResults', tweet: { rest_id: '11' } };
+      const payload = {
+        data: {
+          home: {
+            home_timeline_urt: {
+              instructions: [
+                {
+                  type: 'TimelineAddEntries',
+                  entries: [
+                    {
+                      content: {
+                        items: [
+                          { item: { itemContent: { tweet_results: { result: tweetEntity } } } },
+                          { item: { itemContent: { tweet_results: { result: hiddenTweet } } } },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      };
+
+      expect(parseTimelineTweets(payload)).toEqual([tweetEntity, hiddenTweet.tweet]);
+    });
   });
 
   describe('resolveRestId', () => {
